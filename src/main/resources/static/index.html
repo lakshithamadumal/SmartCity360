@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCity360™ | Municipal Operations Platform</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="brand-header">
+      <div class="brand-logo-text">
+        <span>SMARTCITY360</span>
+        <span class="brand-dot"></span>
+      </div>
+    </div>
+
+    <div class="nav-section-title">City Management</div>
+    <div class="nav-list">
+      <a class="nav-item active" data-stage="stage-overview">
+        <i class="fas fa-grip"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a class="nav-item" data-stage="stage-decorator">
+        <i class="fas fa-shield-halved"></i>
+        <span>Energy Stream Security</span>
+      </a>
+
+      <a class="nav-item" data-stage="stage-composite">
+        <i class="fas fa-sitemap"></i>
+        <span>Smart Zone Hierarchy</span>
+      </a>
+
+      <a class="nav-item" data-stage="stage-chain">
+        <i class="fas fa-route"></i>
+        <span>Citizen Complaints</span>
+      </a>
+
+      <a class="nav-item" data-stage="stage-flyweight">
+        <i class="fas fa-lightbulb"></i>
+        <span>Streetlights Fleet</span>
+      </a>
+
+      <a class="nav-item" data-stage="stage-interpreter">
+        <i class="fas fa-scale-balanced"></i>
+        <span>City Policy Rules</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <div class="main-wrapper">
+
+    <main class="page-content" style="padding-top: 28px;">
+
+      <section id="stage-overview" class="stage-tab-content active">
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 22px;">
+          
+          <div class="clean-card" style="cursor: pointer;" onclick="document.querySelector('[data-stage=stage-decorator]').click()">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Energy Telemetry</span>
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: #ecfccb; color: #4d7c0f; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fas fa-shield-halved"></i>
+              </div>
+            </div>
+            <div class="big-stat-number" style="font-size: 26px; margin: 8px 0 4px;">1,420 Meters</div>
+            <div style="font-size: 12px; color: var(--text-muted);">AES-256 Encrypted Streams</div>
+            <div style="font-size: 11px; color: var(--accent-lime); font-weight: 600; margin-top: 6px;">
+              <i class="fas fa-circle-check"></i> Real-time Ingestion
+            </div>
+          </div>
+
+          <div class="clean-card" style="cursor: pointer;" onclick="document.querySelector('[data-stage=stage-composite]').click()">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">City Zones</span>
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: #fef9c3; color: #a16207; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fas fa-sitemap"></i>
+              </div>
+            </div>
+            <div class="big-stat-number" style="font-size: 26px; margin: 8px 0 4px;">4 Grid Levels</div>
+            <div style="font-size: 12px; color: var(--text-muted);">City ➔ Districts ➔ Streets ➔ Buildings</div>
+            <div style="font-size: 11px; color: #ca8a04; font-weight: 600; margin-top: 6px;">
+              <i class="fas fa-bolt"></i> Uniform Grid Control
+            </div>
+          </div>
+
+          <div class="clean-card" style="cursor: pointer;" onclick="document.querySelector('[data-stage=stage-chain]').click()">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Citizen Issues</span>
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: #ffedd5; color: #c2410c; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fas fa-route"></i>
+              </div>
+            </div>
+            <div class="big-stat-number" style="font-size: 26px; margin: 8px 0 4px;">19 Open Tickets</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Local Staff, Supervisors, City Manager</div>
+            <div style="font-size: 11px; color: var(--accent-orange); font-weight: 600; margin-top: 6px;">
+              <i class="fas fa-clock"></i> Automated Escalation
+            </div>
+          </div>
+
+          <div class="clean-card" style="cursor: pointer;" onclick="document.querySelector('[data-stage=stage-flyweight]').click()">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Smart Streetlights</span>
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fas fa-lightbulb"></i>
+              </div>
+            </div>
+            <div class="big-stat-number" style="font-size: 26px; margin: 8px 0 4px;">50,000 Nodes</div>
+            <div style="font-size: 12px; color: var(--text-muted);">RAM Footprint: 2.1 MB</div>
+            <div style="font-size: 11px; color: var(--accent-lime); font-weight: 600; margin-top: 6px;">
+              <i class="fas fa-microchip"></i> High-Efficiency Pooled
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 22px; align-items: stretch;">
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="hero-metric-header">
+              <div>
+                <div class="big-stat-number">12,450 <span style="font-size: 16px; font-weight: 600; color: var(--text-muted);">kWh</span></div>
+                <div class="stat-sublabel">Total Municipal Power Consumption across City Zones</div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="chart-legend-row">
+                  <div class="legend-item"><span class="legend-square lime"></span> Residential Grid</div>
+                  <div class="legend-item"><span class="legend-square yellow"></span> Commercial Hubs</div>
+                  <div class="legend-item"><span class="legend-square orange"></span> Industrial Complex</div>
+                </div>
+                <div class="pill-dropdown-trigger">
+                  <span>Last 7 Days</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="segmented-bars-container" id="energyChartContainer">
+              
+              <div class="chart-guideline" style="bottom: 25%;"></div>
+              <div class="chart-guideline" style="bottom: 50%;"></div>
+              <div class="chart-guideline" style="bottom: 75%;"></div>
+
+              <div id="chartTooltip" class="chart-floating-tooltip">
+                <div class="tooltip-date" id="tooltipDate">Wednesday, 25 Feb 2026</div>
+                <div class="tooltip-row">
+                  <div class="tooltip-label"><span class="tooltip-dot lime"></span> Residential Grid</div>
+                  <div class="tooltip-val" id="tooltipResidential">480 kWh</div>
+                </div>
+                <div class="tooltip-row">
+                  <div class="tooltip-label"><span class="tooltip-dot yellow"></span> Commercial Hubs</div>
+                  <div class="tooltip-val" id="tooltipCommercial">560 kWh</div>
+                </div>
+                <div class="tooltip-row" id="tooltipIndustrialRow">
+                  <div class="tooltip-label"><span class="tooltip-dot orange"></span> Industrial Complex</div>
+                  <div class="tooltip-val" id="tooltipIndustrial">560 kWh</div>
+                </div>
+                <div class="tooltip-total-row">
+                  <span>Daily Total</span>
+                  <span id="tooltipTotal" style="font-weight: 700; color: var(--text-main);">1,600 kWh</span>
+                </div>
+                <div class="tooltip-arrow" id="tooltipArrow"></div>
+              </div>
+
+              <div class="bar-day-column" 
+                   data-day="Sun" 
+                   data-date="Sunday, 22 Feb 2026" 
+                   data-res="620 kWh" 
+                   data-comm="340 kWh" 
+                   data-ind="0 kWh" 
+                   data-total="960 kWh">
+                <div class="bar-track">
+                  <div class="bar-seg lime" style="height: 45%;"></div>
+                  <div class="bar-seg yellow" style="height: 25%;"></div>
+                </div>
+                <span class="day-label">Sun</span>
+              </div>
+
+              <div class="bar-day-column" 
+                   data-day="Mon" 
+                   data-date="Monday, 23 Feb 2026" 
+                   data-res="780 kWh" 
+                   data-comm="260 kWh" 
+                   data-ind="0 kWh" 
+                   data-total="1,040 kWh">
+                <div class="bar-track">
+                  <div class="bar-seg lime" style="height: 60%;"></div>
+                  <div class="bar-seg yellow" style="height: 20%;"></div>
+                </div>
+                <span class="day-label">Mon</span>
+              </div>
+
+              <div class="bar-day-column" 
+                   data-day="Tue" 
+                   data-date="Tuesday, 24 Feb 2026" 
+                   data-res="820 kWh" 
+                   data-comm="450 kWh" 
+                   data-ind="0 kWh" 
+                   data-total="1,270 kWh">
+                <div class="bar-track">
+                  <div class="bar-seg lime" style="height: 55%;"></div>
+                  <div class="bar-seg yellow" style="height: 30%;"></div>
+                </div>
+                <span class="day-label">Tue</span>
+              </div>
+
+              <div class="bar-day-column active" 
+                   data-day="Wed" 
+                   data-date="Wednesday, 25 Feb 2026" 
+                   data-res="480 kWh" 
+                   data-comm="560 kWh" 
+                   data-ind="560 kWh" 
+                   data-total="1,600 kWh">
+                <div class="bar-track active-day">
+                  <div class="bar-seg orange bar-seg-striped" style="height: 35%;"></div>
+                  <div class="bar-seg yellow" style="height: 35%;"></div>
+                  <div class="bar-seg lime" style="height: 30%;"></div>
+                </div>
+                <span class="day-label" style="font-weight: 700; color: var(--text-main);">Wed</span>
+              </div>
+
+              <div class="bar-day-column" 
+                   data-day="Thu" 
+                   data-date="Thursday, 26 Feb 2026" 
+                   data-res="590 kWh" 
+                   data-comm="370 kWh" 
+                   data-ind="0 kWh" 
+                   data-total="960 kWh">
+                <div class="bar-track">
+                  <div class="bar-seg lime" style="height: 40%;"></div>
+                  <div class="bar-seg yellow" style="height: 25%;"></div>
+                </div>
+                <span class="day-label">Thu</span>
+              </div>
+
+              <div class="bar-day-column" 
+                   data-day="Fri" 
+                   data-date="Friday, 27 Feb 2026" 
+                   data-res="980 kWh" 
+                   data-comm="210 kWh" 
+                   data-ind="0 kWh" 
+                   data-total="1,190 kWh">
+                <div class="bar-track">
+                  <div class="bar-seg lime" style="height: 70%;"></div>
+                  <div class="bar-seg yellow" style="height: 15%;"></div>
+                </div>
+                <span class="day-label">Fri</span>
+              </div>
+
+              <div class="bar-day-column" 
+                   data-day="Sat" 
+                   data-date="Saturday, 28 Feb 2026" 
+                   data-res="750 kWh" 
+                   data-comm="300 kWh" 
+                   data-ind="0 kWh" 
+                   data-total="1,050 kWh">
+                <div class="bar-track">
+                  <div class="bar-seg lime" style="height: 50%;"></div>
+                  <div class="bar-seg yellow" style="height: 20%;"></div>
+                </div>
+                <span class="day-label">Sat</span>
+              </div>
+            </div>
+
+            <div class="mini-stats-column-wrap">
+              <div class="mini-stat-card">
+                <span class="mini-stat-title">Active Energy Streams</span>
+                <div class="mini-stat-val">15,000 pkts/hr</div>
+                <span class="mini-stat-trend"><i class="fas fa-arrow-trend-up"></i> Real-time Ingestion</span>
+              </div>
+              <div class="mini-stat-card">
+                <span class="mini-stat-title">Current Grid Load</span>
+                <div class="mini-stat-val">6,700 kW</div>
+                <span class="mini-stat-trend" style="color: var(--accent-orange);"><i class="fas fa-bolt"></i> 67% Capacity</span>
+              </div>
+              <div class="mini-stat-card">
+                <span class="mini-stat-title">RAM Preservation</span>
+                <div class="mini-stat-val">2.1 MB / 48 MB</div>
+                <span class="mini-stat-trend"><i class="fas fa-leaf"></i> 95.6% Optimized</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="card-title-bar">
+              <div>
+                <h3>Operations Activity Log</h3>
+                <span class="card-subtitle">Real-time municipal events</span>
+              </div>
+              <div class="pill-dropdown-trigger">
+                <span>Live</span>
+              </div>
+            </div>
+
+            <div class="history-list-wrap">
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #ecfccb; color: #4d7c0f;">
+                    <i class="fas fa-shield"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Meter Stream #9042</div>
+                    <div class="history-date">Secured with AES-256 + HMAC + GZip</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount">Active</span>
+                  <span class="history-status-badge completed">Secured</span>
+                </div>
+              </div>
+
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #fee2e2; color: #b91c1c;">
+                    <i class="fas fa-power-off"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Downtown Zone Shutdown</div>
+                    <div class="history-date">Uniform power cut command executed</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount" style="color: var(--accent-crimson);">Power Cut</span>
+                  <span class="history-status-badge declined">Sub-grid</span>
+                </div>
+              </div>
+
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #e0f2fe; color: #0284c7;">
+                    <i class="fas fa-lightbulb"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Streetlights Fleet Pooled</div>
+                    <div class="history-date">50,000 lights allocated in memory</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount">2.1 MB</span>
+                  <span class="history-status-badge completed">95.6% Saved</span>
+                </div>
+              </div>
+
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #ffedd5; color: #c2410c;">
+                    <i class="fas fa-route"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Water Main Burst #8911</div>
+                    <div class="history-date">Level 4 Severity escalated to Supervisor</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount">Tier 2</span>
+                  <span class="history-status-badge pending">Dispatched</span>
+                </div>
+              </div>
+
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #f3e8ff; color: #7e22ce;">
+                    <i class="fas fa-scale-balanced"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Noise Limit Violation (74 dB)</div>
+                    <div class="history-date">Residential zone rule evaluated</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount" style="color: var(--accent-crimson);">Violation</span>
+                  <span class="history-status-badge declined">Fined</span>
+                </div>
+              </div>
+
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #e0e7ff; color: #4338ca;">
+                    <i class="fas fa-network-wired"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Substation Alpha Telemetry</div>
+                    <div class="history-date">Automated meter telemetry verified</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount">1,420 pkts</span>
+                  <span class="history-status-badge completed">Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        </div>
+      </section>
+
+      <section id="stage-decorator" class="stage-tab-content">
+        <div class="clean-card" style="margin-bottom: 22px;">
+          <div class="card-title-bar">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800;">Dynamic Security Wrappers for Data Streams</h2>
+              <span class="card-subtitle">Energy Meter Stream Protection</span>
+            </div>
+            <span class="history-status-badge completed">Decorator Architecture</span>
+          </div>
+          <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+            SmartCity360 secures telemetry data streams from energy meters with layered wrappers (Encryption, Authentication, Compression) without altering core meter logic.
+          </p>
+        </div>
+
+        <div class="light-pipeline-track">
+          <div class="light-pipeline-node active-layer" id="nodeRawStream">
+            <div style="font-size: 10px; font-weight: 700; color: var(--accent-lime); text-transform: uppercase;">Core Component</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 4px;">EnergyMeterStream</div>
+          </div>
+          <i class="fas fa-arrow-right" style="color: var(--accent-lime);"></i>
+          <div class="light-pipeline-node active-layer" id="nodeEncryption">
+            <div style="font-size: 10px; font-weight: 700; color: var(--accent-lime); text-transform: uppercase;">Security Layer 1</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 4px;">EncryptionDecorator</div>
+          </div>
+          <i class="fas fa-arrow-right" style="color: var(--accent-lime);"></i>
+          <div class="light-pipeline-node active-layer" id="nodeAuth">
+            <div style="font-size: 10px; font-weight: 700; color: var(--accent-lime); text-transform: uppercase;">Security Layer 2</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 4px;">AuthenticationDecorator</div>
+          </div>
+          <i class="fas fa-arrow-right" style="color: var(--accent-lime);"></i>
+          <div class="light-pipeline-node active-layer" id="nodeCompression">
+            <div style="font-size: 10px; font-weight: 700; color: var(--accent-lime); text-transform: uppercase;">Security Layer 3</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 4px;">CompressionDecorator</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 24px; align-items: stretch;">
+          
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar" style="margin-bottom: 12px;">
+                <div>
+                  <h3 style="font-size: 16px;">Stream Configuration</h3>
+                  <span class="card-subtitle">Decorator pipeline parameters</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Energy Meter Source:</label>
+                <select id="meterSelect" class="light-select" style="margin-top: 6px;">
+                  <option value="GRID-MTR-9042">GRID-MTR-9042 (Commercial Downtown)</option>
+                  <option value="SOLAR-SUB-114">SOLAR-SUB-114 (Green Valley Residential)</option>
+                  <option value="IND-MTR-552">IND-MTR-552 (North Port Industrial Grid)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 10px; margin: 16px 0;">
+                <label class="layer-control-tile active-tile" for="layerEncryption">
+                  <input type="checkbox" id="layerEncryption" checked style="accent-color: var(--accent-lime); width: 17px; height: 17px; cursor: pointer; margin-top: 2px;">
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="font-size: 12.5px; font-weight: 700; color: var(--text-main);">AES-256-GCM Encryption</span>
+                      <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; background: #ecfccb; color: #4d7c0f; border-radius: 4px;">Layer 1</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Encrypts voltage, current & kWh readings</div>
+                  </div>
+                </label>
+
+                <label class="layer-control-tile active-tile" for="layerAuth">
+                  <input type="checkbox" id="layerAuth" checked style="accent-color: var(--accent-lime); width: 17px; height: 17px; cursor: pointer; margin-top: 2px;">
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="font-size: 12.5px; font-weight: 700; color: var(--text-main);">HMAC-SHA256 Token Auth</span>
+                      <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; background: #fef9c3; color: #a16207; border-radius: 4px;">Layer 2</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Appends tamper-proof cryptographic signature</div>
+                  </div>
+                </label>
+
+                <label class="layer-control-tile active-tile" for="layerCompression">
+                  <input type="checkbox" id="layerCompression" checked style="accent-color: var(--accent-lime); width: 17px; height: 17px; cursor: pointer; margin-top: 2px;">
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="font-size: 12.5px; font-weight: 700; color: var(--text-main);">GZIP Stream Compression</span>
+                      <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; background: #e0f2fe; color: #0369a1; border-radius: 4px;">Layer 3</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Reduces transmission bandwidth by ~58%</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button id="btnTransmitStream" class="btn-clean-lime" style="width: 100%; padding: 12px; font-size: 13.5px; font-weight: 700; margin-top: 14px;">
+              <i class="fas fa-paper-plane"></i> Transmit Secured Stream
+            </button>
+          </div>
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between; min-width: 0;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3>Packet Telemetry & Payload Inspector</h3>
+                  <span class="card-subtitle">Runtime byte-level transformation</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <span class="nav-badge-pill" id="appliedLayersCount">3 Layer(s)</span>
+                  <span class="nav-badge-pill" id="streamLatency" style="background: #ecfccb; color: #4d7c0f; font-weight: 700;"><i class="fas fa-bolt"></i> 35 ms</span>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px;">
+                <div style="display: flex; flex-direction: column; min-width: 0;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px;">
+                    <i class="fas fa-code"></i> Raw Component Stream:
+                  </span>
+                  <pre id="rawStreamPreview" class="light-console-box"></pre>
+                </div>
+                <div style="display: flex; flex-direction: column; min-width: 0;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--accent-lime); text-transform: uppercase; margin-bottom: 6px;">
+                    <i class="fas fa-shield-halved"></i> Secured Pipeline Output:
+                  </span>
+                  <pre id="securedPayloadPreview" class="light-console-box" style="color: #38bdf8;"></pre>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Payload Encoding</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">AES-256 + HMAC</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Bandwidth Saved</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--accent-lime); font-family: var(--font-mono);">58.4% Reduced</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Security Standard</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">FIPS 140-2 Valid</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-composite" class="stage-tab-content">
+        <div class="clean-card" style="margin-bottom: 22px;">
+          <div class="card-title-bar">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800;">Smart Zone Grid Hierarchy</h2>
+              <span class="card-subtitle">Uniform Municipal Energy Control</span>
+            </div>
+            <span class="history-status-badge completed">Composite Architecture</span>
+          </div>
+          <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+            City zones (City ➔ District ➔ Street ➔ Building) are structured hierarchically so operations like "shutdown power" or "report usage" apply uniformly across leaves and groups.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: stretch;">
+          
+          <div class="clean-card" style="display: flex; flex-direction: column;">
+            <div class="card-title-bar">
+              <div>
+                <h3>Zone Hierarchy Tree</h3>
+                <span class="card-subtitle">Select node to target uniform command</span>
+              </div>
+              <span class="history-status-badge completed" id="selectedZoneBadge">Target: Metropolis City</span>
+            </div>
+            <div id="zoneTreeContainer" style="display: flex; flex-direction: column; gap: 4px; margin-top: 10px;"></div>
+          </div>
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3>Uniform Command Dispatcher</h3>
+                  <span class="card-subtitle">1:N Composite command propagation</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                <button id="btnZoneShutdown" class="btn-clean-danger">
+                  <i class="fas fa-power-off"></i> Shutdown Power
+                </button>
+                <button id="btnZoneRestore" class="btn-clean-success">
+                  <i class="fas fa-plug-circle-check"></i> Restore Power
+                </button>
+                <button id="btnZoneReport" class="btn-clean-primary">
+                  <i class="fas fa-chart-line"></i> Report Usage
+                </button>
+              </div>
+
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Recursive Execution Trace:</div>
+              <div id="zoneExecutionConsole" class="light-console-box" style="height: 410px;">
+                <div>[SYSTEM_READY] ZoneComponent hierarchy initialized. Awaiting commands...</div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Root Component</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">ZoneComposite</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Leaf Component</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--accent-lime); font-family: var(--font-mono);">BuildingLeaf</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Traversal Model</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">Depth-First Poly</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-chain" class="stage-tab-content">
+        <div class="clean-card" style="margin-bottom: 22px;">
+          <div class="card-title-bar">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800;">Citizen Complaints Escalation</h2>
+              <span class="card-subtitle">Automated Severity Routing</span>
+            </div>
+            <span class="history-status-badge completed">Chain of Responsibility</span>
+          </div>
+          <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+            Resident complaints are routed dynamically along an escalation chain based on issue severity: Local Staff ➔ Supervisors ➔ City Managers.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px;">
+          <div class="clean-card" id="stationStaff">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span class="history-status-badge completed">TIER 1 (SEVERITY 1-2)</span>
+              <i class="fas fa-user-check" style="color: var(--accent-lime);"></i>
+            </div>
+            <h4>Local Staff Handler</h4>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Handles routine civic maintenance (Potholes, streetlight flickers, littering).</p>
+          </div>
+
+          <div class="clean-card" id="stationSupervisor">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span class="history-status-badge pending">TIER 2 (SEVERITY 3-4)</span>
+              <i class="fas fa-user-gear" style="color: var(--accent-yellow);"></i>
+            </div>
+            <h4>Field Supervisor Handler</h4>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Handles moderate infrastructure disruptions (Water pipe bursts, traffic grid trips).</p>
+          </div>
+
+          <div class="clean-card" id="stationManager">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span class="history-status-badge declined">TIER 3 (SEVERITY 5)</span>
+              <i class="fas fa-user-tie" style="color: var(--accent-orange);"></i>
+            </div>
+            <h4>City Manager Handler</h4>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Handles catastrophic municipal emergencies (Bridge collapse risk, disaster alerts).</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 24px; align-items: stretch;">
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar" style="margin-bottom: 12px;">
+                <div>
+                  <h3 style="font-size: 16px;">Dispatch Resident Complaint</h3>
+                  <span class="card-subtitle">Submit civic ticket for automated routing</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 14px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Resident Name:</label>
+                <input type="text" id="citizenNameInput" class="light-input" value="Kasun Perera" style="margin-top: 6px;">
+              </div>
+
+              <div style="margin-bottom: 14px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Category:</label>
+                <select id="complaintCategorySelect" class="light-select" style="margin-top: 6px;">
+                  <option value="INFRASTRUCTURE">Civil Infrastructure</option>
+                  <option value="POWER_GRID">Power & Electrical</option>
+                  <option value="WATER_UTILITY">Municipal Water Leak</option>
+                </select>
+              </div>
+
+              <div style="margin-bottom: 18px; padding: 14px; background: #f8fafc; border: 1px solid var(--border-card); border-radius: var(--radius-md);">
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                  <span style="font-weight: 700; color: var(--text-main);">Severity Level (1 to 5):</span>
+                  <span id="severityValueDisplay" style="font-weight: 700; color: var(--accent-lime);">Level 2: Routine</span>
+                </div>
+                <input type="range" id="complaintSeveritySlider" min="1" max="5" value="2" style="width: 100%; accent-color: var(--accent-lime); margin-top: 10px;">
+                <p id="severityDescDisplay" style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">Handled by Local Front Desk Staff.</p>
+              </div>
+            </div>
+
+            <button id="btnDispatchComplaint" class="btn-clean-lime" style="width: 100%; padding: 12px; font-size: 13.5px; font-weight: 700;">
+              <i class="fas fa-paper-plane"></i> Dispatch to Escalation Chain
+            </button>
+          </div>
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3 style="font-size: 16px;">Complaint Audit Trail</h3>
+                  <span class="card-subtitle">Real-time handler resolution record</span>
+                </div>
+                <span class="history-status-badge completed">Live Dispatch</span>
+              </div>
+
+              <div style="flex: 1; overflow-x: auto; min-height: 220px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-muted); text-align: left;">
+                      <th style="padding: 10px 8px;">ID</th>
+                      <th style="padding: 10px 8px;">Citizen</th>
+                      <th style="padding: 10px 8px;">Category</th>
+                      <th style="padding: 10px 8px;">Severity</th>
+                      <th style="padding: 10px 8px;">Handler Assigned</th>
+                      <th style="padding: 10px 8px;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="complaintHistoryTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Routing Pattern</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">Chain of Responsibility</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Decoupled Senders</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--accent-lime); font-family: var(--font-mono);">100% Dynamic</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted);">Escalation Ceiling</span>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">City Manager (L5)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-flyweight" class="stage-tab-content">
+        <div class="clean-card" style="margin-bottom: 22px;">
+          <div class="card-title-bar">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800;">Smart Streetlights Fleet Management</h2>
+              <span class="card-subtitle">Memory-Optimized Municipal Lighting</span>
+            </div>
+            <span class="history-status-badge completed">Flyweight Architecture</span>
+          </div>
+          <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+            Optimizes system resources by sharing immutable Intrinsic state (model, wattage, specs) across 50,000+ streetlights while managing Extrinsic state (coordinates, on/off) dynamically.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 24px; align-items: stretch; margin-bottom: 22px;">
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3 style="font-size: 16px;">Municipal Street Network & Lighting Grid</h3>
+                  <span class="card-subtitle">50,000 nodes mapped along city corridors</span>
+                </div>
+                <button id="btnToggleLights" class="btn-clean-primary" style="padding: 7px 14px; font-size: 12px;">
+                  <i class="fas fa-lightbulb"></i> Toggle Light State
+                </button>
+              </div>
+
+              <div style="display: flex; gap: 16px; margin-bottom: 12px; font-size: 11.5px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 9px; height: 9px; border-radius: 50%; background: #facc15; box-shadow: 0 0 6px #facc15;"></span>
+                  <span style="color: var(--text-main); font-weight: 600;">90W Warm LED</span>
+                  <span style="color: var(--text-dim);">(Downtown Ave)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 9px; height: 9px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+                  <span style="color: var(--text-main); font-weight: 600;">150W High-Mast LED</span>
+                  <span style="color: var(--text-dim);">(Highway 101)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 9px; height: 9px; border-radius: 50%; background: #84cc16; box-shadow: 0 0 6px #84cc16;"></span>
+                  <span style="color: var(--text-main); font-weight: 600;">60W Solar LED</span>
+                  <span style="color: var(--text-dim);">(Parkway)</span>
+                </div>
+              </div>
+
+              <div style="position: relative; height: 320px; background: #0b1120; border-radius: var(--radius-md); overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <canvas id="fleetCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
+
+                <div id="streetlightTooltip" style="position: absolute; display: none; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 10px 14px; font-size: 11.5px; color: #ffffff; pointer-events: none; z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.4); transform: translate(-50%, -120%); min-width: 180px;">
+                  <div id="slTipId" style="font-weight: 700; color: #84cc16; font-size: 12px; margin-bottom: 4px;">#SL-4281</div>
+                  <div id="slTipRoad" style="color: #cbd5e1; font-size: 11px;">Road: Metropolis Highway 101</div>
+                  <div id="slTipType" style="color: #38bdf8; font-weight: 600; font-size: 11px; margin-top: 2px;">Type: 150W High-Mast LED</div>
+                  <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 6px; padding-top: 6px; font-size: 10.5px; color: #94a3b8;">
+                    Flyweight Object: <span style="color: #facc15; font-weight: 600;">Shared Instance</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle); font-size: 11.5px;">
+              <span style="color: var(--text-muted);">
+                <i class="fas fa-satellite-dish" style="color: var(--accent-lime);"></i> GPS Mesh Synchronization: <strong>Active (50,000 Extrinsic Positions)</strong>
+              </span>
+              <span class="history-status-badge completed" id="fleetStatusBadge">All Lights ON (100% Lumens)</span>
+            </div>
+          </div>
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3 style="font-size: 16px;">Memory RAM Profiler</h3>
+                  <span class="card-subtitle">JVM Heap Footprint Evaluation</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 14px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Simulated Fleet Scale:</label>
+                <select id="fleetCountSelect" class="light-select" style="margin-top: 6px;">
+                  <option value="5000">5,000 Streetlights</option>
+                  <option value="20000">20,000 Streetlights</option>
+                  <option value="50000" selected>50,000 Streetlights (Full Municipal Grid)</option>
+                  <option value="100000">100,000 Streetlights (Metro Region)</option>
+                </select>
+              </div>
+
+              <button id="btnSpawnFleet" class="btn-clean-lime" style="width: 100%; padding: 12px; font-size: 13.5px; font-weight: 700; margin-bottom: 16px;">
+                <i class="fas fa-microchip"></i> Spawn & Profile Fleet
+              </button>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; text-align: center;">
+                <div style="background: #fee2e2; padding: 14px; border-radius: var(--radius-md);">
+                  <div style="font-size: 10.5px; color: #b91c1c; font-weight: 700;">UNOPTIMIZED HEAP</div>
+                  <div id="ramWithoutFlyweight" style="font-size: 24px; font-weight: 800; color: #b91c1c; font-family: var(--font-mono); margin-top: 4px;">43.9 MB</div>
+                  <div style="font-size: 10.5px; color: #991b1b; margin-top: 4px;">50,000 separate objects</div>
+                </div>
+                <div style="background: #ecfccb; padding: 14px; border-radius: var(--radius-md);">
+                  <div style="font-size: 10.5px; color: #4d7c0f; font-weight: 700;">FLYWEIGHT HEAP</div>
+                  <div id="ramWithFlyweight" style="font-size: 24px; font-weight: 800; color: #4d7c0f; font-family: var(--font-mono); margin-top: 4px;">1.81 MB</div>
+                  <div style="font-size: 10.5px; color: #3f6212; margin-top: 4px;">3 Flyweights + Extrinsic refs</div>
+                </div>
+              </div>
+
+              <div style="background: #f7fee7; border: 1.5px solid #d9f99d; padding: 16px; border-radius: var(--radius-md); text-align: center; margin-top: 14px;">
+                <div style="font-size: 11px; font-weight: 700; color: #4d7c0f; text-transform: uppercase;">Preserved JVM Heap Memory</div>
+                <div id="ramSavingsPercent" style="font-size: 32px; font-weight: 800; color: #4d7c0f; font-family: var(--font-mono); margin-top: 2px;">95.9%</div>
+                <div style="font-size: 11px; color: #4d7c0f; margin-top: 4px;">42.1 MB RAM saved across municipal grid</div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); font-size: 11.5px;">
+              <div>
+                <span style="color: var(--text-muted);">Intrinsic Objects:</span>
+                <div style="font-weight: 700; color: var(--text-main);">3 Singletons in Heap</div>
+              </div>
+              <div>
+                <span style="color: var(--text-muted);">Extrinsic Cost:</span>
+                <div style="font-weight: 700; color: var(--accent-lime);">38 Bytes / Node</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="clean-card">
+          <div class="card-title-bar">
+            <div>
+              <h3 style="font-size: 16px;">Shared Flyweight Type Registry (Intrinsic State Pool)</h3>
+              <span class="card-subtitle">Managed via StreetLightFactory — Only 3 object instances created in memory</span>
+            </div>
+            <span class="history-status-badge completed">StreetLightFactory Cache</span>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-muted); text-align: left;">
+                <th style="padding: 10px 8px;">Flyweight ID</th>
+                <th style="padding: 10px 8px;">Model & Specs</th>
+                <th style="padding: 10px 8px;">Manufacturer</th>
+                <th style="padding: 10px 8px;">Corridor Deployment</th>
+                <th style="padding: 10px 8px;">Active Nodes Sharing Object</th>
+                <th style="padding: 10px 8px;">Instance Count</th>
+                <th style="padding: 10px 8px;">Memory Efficiency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 12px 8px; font-weight: 700; font-family: var(--font-mono);">
+                  <span style="color: #facc15;">●</span> LED-90W-WARM
+                </td>
+                <td style="padding: 12px 8px;">90W LED • 3000K Warm • 9,500 Lumens</td>
+                <td style="padding: 12px 8px;">Philips Lumileds Co.</td>
+                <td style="padding: 12px 8px;">Downtown Ave & Commercial Hub</td>
+                <td style="padding: 12px 8px; font-weight: 700; font-family: var(--font-mono);">24,120 Streetlights</td>
+                <td style="padding: 12px 8px;"><span class="history-status-badge completed">1 Instance</span></td>
+                <td style="padding: 12px 8px; color: var(--accent-lime); font-weight: 700;">95.9% Preserved</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 12px 8px; font-weight: 700; font-family: var(--font-mono);">
+                  <span style="color: #38bdf8;">●</span> LED-150W-WHITE
+                </td>
+                <td style="padding: 12px 8px;">150W High-Mast • 5000K Cool • 18,000 Lumens</td>
+                <td style="padding: 12px 8px;">Osram Opto Systems</td>
+                <td style="padding: 12px 8px;">Metropolis Highway 101 & Arterial Ring</td>
+                <td style="padding: 12px 8px; font-weight: 700; font-family: var(--font-mono);">18,400 Streetlights</td>
+                <td style="padding: 12px 8px;"><span class="history-status-badge completed">1 Instance</span></td>
+                <td style="padding: 12px 8px; color: var(--accent-lime); font-weight: 700;">96.1% Preserved</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 8px; font-weight: 700; font-family: var(--font-mono);">
+                  <span style="color: #84cc16;">●</span> SOLAR-60W-ECO
+                </td>
+                <td style="padding: 12px 8px;">60W Solar Powered • 4000K Neutral • 6,200 Lumens</td>
+                <td style="padding: 12px 8px;">Tesla Energy City</td>
+                <td style="padding: 12px 8px;">Green Valley Parkway & Eco Corridors</td>
+                <td style="padding: 12px 8px; font-weight: 700; font-family: var(--font-mono);">7,480 Streetlights</td>
+                <td style="padding: 12px 8px;"><span class="history-status-badge completed">1 Instance</span></td>
+                <td style="padding: 12px 8px; color: var(--accent-lime); font-weight: 700;">95.6% Preserved</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="stage-interpreter" class="stage-tab-content">
+        <div class="clean-card" style="margin-bottom: 22px;">
+          <div class="card-title-bar">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800;">City Policy Rules & DSL Interpreter</h2>
+              <span class="card-subtitle">Automated Municipal Bylaw Evaluation</span>
+            </div>
+            <span class="history-status-badge completed">Interpreter Architecture</span>
+          </div>
+          <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+            Operational city regulations (noise thresholds, parking curfews, environmental limits) are written in a mini-language and dynamically evaluated against live sensor context.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; margin-bottom: 22px;">
+          
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3 style="font-size: 16px;">Policy Rule Definition</h3>
+                  <span class="card-subtitle">DSL Mini-Language Expression</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 12px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Policy Rule Template:</label>
+                <select id="dslRulePreset" class="light-select" style="margin-top: 6px;">
+                  <option value="noise">Noise Ordinance (Residential dB Limit)</option>
+                  <option value="parking">Night Parking Restriction (Curfew Bay)</option>
+                  <option value="environmental">Environmental Health Alert (Air & Heat)</option>
+                </select>
+              </div>
+
+              <div style="margin-bottom: 12px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Expression (Domain-Specific Language):</label>
+                <textarea id="dslRuleInput" class="light-input" style="height: 80px; font-family: var(--font-mono); margin-top: 6px; font-size: 12px; line-height: 1.5;">IF (ZONE == "RESIDENTIAL" AND NOISE_LEVEL > 65) THEN VIOLATION</textarea>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; padding: 14px; background: #f8fafc; border: 1px solid var(--border-card); border-radius: var(--radius-md);">
+                <div>
+                  <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Context: ZONE</label>
+                  <select id="ctxZoneSelect" class="light-select" style="padding: 7px 10px; margin-top: 4px; font-size: 12px;">
+                    <option value="RESIDENTIAL" selected>RESIDENTIAL</option>
+                    <option value="COMMERCIAL">COMMERCIAL</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Context: NOISE_LEVEL (dB)</label>
+                  <input type="number" id="ctxNoiseInput" class="light-input" style="padding: 7px 10px; margin-top: 4px; font-size: 12px;" value="74">
+                </div>
+              </div>
+            </div>
+
+            <button id="btnEvaluateDSL" class="btn-clean-lime" style="width: 100%; padding: 12px; font-size: 13.5px; font-weight: 700;">
+              <i class="fas fa-play"></i> Evaluate Rule Against Context
+            </button>
+          </div>
+
+          <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title-bar">
+                <div>
+                  <h3 style="font-size: 16px;">Parsed Rule Abstract Syntax Tree (AST)</h3>
+                  <span class="card-subtitle">Terminal & Non-Terminal Expression Hierarchy</span>
+                </div>
+                <span class="history-status-badge completed">AST Evaluator</span>
+              </div>
+
+              <div id="astTreeVisualizer" style="background: #f8fafc; border: 1px solid var(--border-card); border-radius: var(--radius-sm); padding: 16px; min-height: 200px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6;"></div>
+            </div>
+
+            <div style="margin-top: 14px;">
+              <div id="dslVerdictBadge" class="btn-clean-danger" style="width: 100%; text-align: center; font-weight: 700; padding: 11px; font-size: 13px;">
+                POLICY VIOLATION TRIGGERED
+              </div>
+              <p id="dslVerdictDetail" style="font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 6px;"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="clean-card">
+          <div class="card-title-bar">
+            <div>
+              <h3 style="font-size: 16px;">Interpreter Pattern Grammar Specification</h3>
+              <span class="card-subtitle">Backus-Naur Form (BNF) Grammar & GoF Composite Expressions</span>
+            </div>
+            <span class="history-status-badge completed">BNF Compliant</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 12px;">
+            <div style="background: #f8fafc; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+              <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Non-Terminal Expressions</div>
+              <code style="color: var(--accent-lime); font-size: 11px;">AndExpression</code>, <code style="color: var(--accent-lime); font-size: 11px;">OrExpression</code>
+              <p style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Recursively evaluates left and right sub-expressions in AST.</p>
+            </div>
+
+            <div style="background: #f8fafc; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+              <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Terminal Expressions</div>
+              <code style="color: #38bdf8; font-size: 11px;">ComparisonExpression</code>
+              <p style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Extracts context variable (e.g., ZONE == "RESIDENTIAL") and evaluates truth value.</p>
+            </div>
+
+            <div style="background: #f8fafc; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+              <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Context Environment</div>
+              <code style="color: #facc15; font-size: 11px;">CityPolicyContext</code>
+              <p style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Holds live telemetry parameters injected from municipal sensors.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-blueprint" class="stage-tab-content">
+        <div class="clean-card" style="margin-bottom: 22px;">
+          <h2 style="font-size: 20px; font-weight: 800;">System Architecture & Design Patterns Specification</h2>
+          <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Technical blueprint showing the Object-Oriented Design Patterns driving the SmartCity360 platform.</p>
+        </div>
+
+        <div class="clean-card" style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 14px;">Architectural Patterns Matrix</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-card); color: var(--text-muted);">
+                <th style="padding: 10px;">Subsystem</th>
+                <th style="padding: 10px;">Design Pattern</th>
+                <th style="padding: 10px;">Classification</th>
+                <th style="padding: 10px;">Architectural Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-card);">
+                <td style="padding: 10px; font-weight: 700;">Energy Telemetry Security</td>
+                <td style="padding: 10px; font-weight: 600; color: var(--accent-lime);">Decorator</td>
+                <td style="padding: 10px;"><span class="history-status-badge completed">Structural</span></td>
+                <td style="padding: 10px; color: var(--text-muted);">Dynamically wraps streams with encryption, HMAC, and compression without subclass explosion.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-card);">
+                <td style="padding: 10px; font-weight: 700;">Smart Zones Grid Hierarchy</td>
+                <td style="padding: 10px; font-weight: 600; color: var(--accent-lime);">Composite</td>
+                <td style="padding: 10px;"><span class="history-status-badge completed">Structural</span></td>
+                <td style="padding: 10px; color: var(--text-muted);">Treats leaves and composites uniformly across City ➔ District ➔ Street ➔ Building hierarchy.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-card);">
+                <td style="padding: 10px; font-weight: 700;">Citizen Complaints Escalation</td>
+                <td style="padding: 10px; font-weight: 600; color: var(--accent-lime);">Chain of Responsibility</td>
+                <td style="padding: 10px;"><span class="history-status-badge pending">Behavioral</span></td>
+                <td style="padding: 10px; color: var(--text-muted);">Decouples sender from receiver, sequentially routing complaints: Local Staff ➔ Supervisor ➔ Manager.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-card);">
+                <td style="padding: 10px; font-weight: 700;">Smart Streetlights Fleet</td>
+                <td style="padding: 10px; font-weight: 600; color: var(--accent-lime);">Flyweight</td>
+                <td style="padding: 10px;"><span class="history-status-badge completed">Structural</span></td>
+                <td style="padding: 10px; color: var(--text-muted);">Shares immutable intrinsic configuration across 50,000 lights to save 95%+ JVM heap memory.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; font-weight: 700;">City Policy Rules Engine</td>
+                <td style="padding: 10px; font-weight: 600; color: var(--accent-lime);">Interpreter</td>
+                <td style="padding: 10px;"><span class="history-status-badge pending">Behavioral</span></td>
+                <td style="padding: 10px; color: var(--text-muted);">Evaluates mini-language grammar expressions against runtime city sensor contexts using an AST.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
