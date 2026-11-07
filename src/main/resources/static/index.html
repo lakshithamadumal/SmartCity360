@@ -991,14 +991,14 @@
                 <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Policy Rule Template:</label>
                 <select id="dslRulePreset" class="light-select" style="margin-top: 6px;">
                   <option value="noise">Noise Ordinance (Residential dB Limit)</option>
-                  <option value="parking">Night Parking Restriction (Curfew Bay)</option>
-                  <option value="environmental">Environmental Health Alert (Air & Heat)</option>
+                  <option value="commercial">Commercial Noise Threshold (ZONE == "COMMERCIAL" AND NOISE_LEVEL > 80)</option>
+                  <option value="quiet">Quiet Hours Rule (ZONE == "RESIDENTIAL" AND NOISE_LEVEL <= 55)</option>
                 </select>
               </div>
 
               <div style="margin-bottom: 12px;">
                 <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Expression (Domain-Specific Language):</label>
-                <textarea id="dslRuleInput" class="light-input" style="height: 80px; font-family: var(--font-mono); margin-top: 6px; font-size: 12px; line-height: 1.5;">IF (ZONE == "RESIDENTIAL" AND NOISE_LEVEL > 65) THEN VIOLATION</textarea>
+                <textarea id="dslRuleInput" class="light-input" style="height: 80px; font-family: var(--font-mono); margin-top: 6px; font-size: 12px; line-height: 1.5;">ZONE == "RESIDENTIAL" AND NOISE_LEVEL > 65</textarea>
               </div>
 
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; padding: 14px; background: #f8fafc; border: 1px solid var(--border-card); border-radius: var(--radius-md);">

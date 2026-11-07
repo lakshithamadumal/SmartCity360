@@ -96,7 +96,7 @@ function initPartADecorator() {
     const chkAuth = document.getElementById('layerAuth');
     const chkCompression = document.getElementById('layerCompression');
     const btnTransmit = document.getElementById('btnTransmitStream');
-    
+
     const nodeEncryption = document.getElementById('nodeEncryption');
     const nodeAuth = document.getElementById('nodeAuth');
     const nodeCompression = document.getElementById('nodeCompression');
@@ -150,14 +150,54 @@ function initPartADecorator() {
 
     if (btnTransmit) {
         btnTransmit.addEventListener('click', () => {
-            btnTransmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Securing & Transmitting...';
+            btnTransmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Securing via Backend Decorator Stack...';
             btnTransmit.disabled = true;
-            setTimeout(() => {
+
+            const meterId = meterSelect?.value || 'GRID-MTR-9042';
+            const enc = chkEncryption?.checked ?? false;
+            const auth = chkAuth?.checked ?? false;
+            const comp = chkCompression?.checked ?? false;
+
+            const rawData = {
+                meterId: meterId,
+                timestamp: new Date().toISOString(),
+                voltage_V: 231.1,
+                current_A: 15.06,
+                active_power_kW: 3.283,
+                total_kwh: 12488.4
+            };
+
+            fetch('/api/stream/secure', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    meterId: meterId,
+                    rawPayload: JSON.stringify(rawData, null, 2),
+                    encrypt: enc,
+                    authenticate: auth,
+                    compress: comp
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const rawPreview = document.getElementById('rawStreamPreview');
+                const secPreview = document.getElementById('securedStreamPreview');
+                const layerCountBadge = document.getElementById('decoratorLayersCount');
+
+                if (rawPreview) rawPreview.textContent = data.rawPayload || JSON.stringify(rawData, null, 2);
+                if (secPreview) secPreview.textContent = "// Pipeline: " + data.pipeline + "\n\n" + data.securedPayload;
+                if (layerCountBadge) layerCountBadge.textContent = `${data.activeLayers} Layer(s)`;
+
+                showNotification('Stream Secured via Pure Java GoF Decorator Pipeline!', 'success');
+            })
+            .catch(() => {
                 updateLayers();
+                showNotification('Stream Secured via Local Simulation Fallback!', 'info');
+            })
+            .finally(() => {
                 btnTransmit.innerHTML = '<i class="fas fa-paper-plane"></i> Transmit Secured Stream';
                 btnTransmit.disabled = false;
-                showNotification('Stream Secured & Dispatched via Decorator Stack!', 'success');
-            }, 500);
+            });
         });
     }
 
@@ -174,147 +214,130 @@ function generateTransformedStream() {
         meterId: meterId,
         timestamp: new Date().toISOString(),
         voltage_V: (230.1 + Math.random() * 2).toFixed(1),
-        current_A: (14.2 + Math.random()).toFixed(2),
-        active_power_kW: (3.26 + Math.random() * 0.2).toFixed(3),
-        total_kwh: (12485.4 + Math.random() * 5).toFixed(1)
+        current_A: (14.8 + Math.random() * 0.5).toFixed(2),
+        active_power_kW: (3.2 + Math.random() * 0.2).toFixed(3),
+        total_kwh: (12480 + Math.random() * 10).toFixed(1)
     };
 
-    const rawJsonStr = JSON.stringify(rawPayload, null, 2);
+    const rawString = JSON.stringify(rawPayload, null, 2);
     const rawPreview = document.getElementById('rawStreamPreview');
-    if (rawPreview) rawPreview.textContent = rawJsonStr;
+    const secPreview = document.getElementById('securedStreamPreview');
+    const layerCountBadge = document.getElementById('decoratorLayersCount');
 
-    let processedText = rawJsonStr;
-    let layersApplied = ['RawMeterStream'];
+    if (rawPreview) rawPreview.textContent = rawString;
+
+    let processedText = rawString;
+    const layersApplied = ['RawMeterStream'];
 
     if (enc) {
-        processedText = btoa(unescape(encodeURIComponent(processedText)));
-        processedText = "CIPHER::AES-256-GCM[" + processedText.substring(0, 110) + "...==" + "]";
         layersApplied.push('EncryptionDecorator');
+        try {
+            processedText = 'CIPHER::AES-256-GCM[' + btoa(unescape(encodeURIComponent(processedText))).substring(0, 48) + '...==]';
+        } catch(e) {
+            processedText = 'CIPHER::AES-256-GCM[ZW5jcnlwdGVkX3BheWxvYWRfZGF0YQ==]';
+        }
     }
-
     if (auth) {
-        const hmac = "HMAC-SHA256::9f86d081884c7d659a2feaa0c55ad015...";
-        processedText = "HEADER[" + hmac + "]\n" + processedText;
         layersApplied.push('AuthenticationDecorator');
+        const pseudoHmac = Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+        processedText = `HEADER[HMAC-SHA256::${pseudoHmac}]::PAYLOAD[${processedText}]`;
     }
-
     if (comp) {
-        processedText = "GZIP_BUFFER::[0x1F, 0x8B, " + Math.round(processedText.length * 0.42) + " compressed bytes]";
         layersApplied.push('CompressionDecorator');
+        const compressedLen = Math.floor(processedText.length * 0.42);
+        processedText = `GZIP_BUFFER::[0x1F, 0x8B, ${compressedLen} compressed bytes]`;
     }
 
-    const secPreview = document.getElementById('securedPayloadPreview');
+    const count = (enc ? 1 : 0) + (auth ? 1 : 0) + (comp ? 1 : 0);
+    if (layerCountBadge) layerCountBadge.textContent = `${count} Layer(s)`;
     if (secPreview) {
         secPreview.textContent = "// Pipeline: " + layersApplied.join(" -> ") + "\n\n" + processedText;
     }
-
-    const countEl = document.getElementById('appliedLayersCount');
-    if (countEl) countEl.textContent = (layersApplied.length - 1) + ' Layer(s)';
-    
-    const latencyEl = document.getElementById('streamLatency');
-    if (latencyEl) latencyEl.textContent = (14 + (layersApplied.length - 1) * 7) + ' ms';
 }
 
-const cityHierarchyData = {
-    id: "zone-root",
-    name: "Metropolis City",
-    type: "City (Composite)",
-    powerStatus: true,
-    children: [
-        {
-            id: "dist-downtown",
-            name: "Downtown Commercial District",
-            type: "District (Composite)",
-            powerStatus: true,
-            children: [
-                {
-                    id: "street-silicon",
-                    name: "Silicon Boulevard",
-                    type: "Street (Composite)",
-                    powerStatus: true,
-                    children: [
-                        { id: "bldg-alpha", name: "Tech Tower Alpha", type: "Building (Leaf)", powerStatus: true, kwh: 1850 },
-                        { id: "bldg-beta",  name: "Innovation Hub Beta", type: "Building (Leaf)", powerStatus: true, kwh: 1550 }
-                    ]
-                },
-                {
-                    id: "street-broadway",
-                    name: "Financial Plaza",
-                    type: "Street (Composite)",
-                    powerStatus: true,
-                    children: [
-                        { id: "bldg-bank", name: "Metro Central Bank", type: "Building (Leaf)", powerStatus: true, kwh: 2200 }
-                    ]
-                }
-            ]
-        },
-        {
-            id: "dist-green",
-            name: "Green Valley Residential District",
-            type: "District (Composite)",
-            powerStatus: true,
-            children: [
-                {
-                    id: "street-maple",
-                    name: "Maple Garden Way",
-                    type: "Street (Composite)",
-                    powerStatus: true,
-                    children: [
-                        { id: "bldg-res-a", name: "Solar Heights A", type: "Building (Leaf)", powerStatus: true, kwh: 1400 },
-                        { id: "bldg-res-b", name: "Solar Heights B", type: "Building (Leaf)", powerStatus: true, kwh: 1400 }
-                    ]
-                }
-            ]
-        }
-    ]
-};
-
-let selectedZoneNode = cityHierarchyData;
+let selectedZoneNode = null;
+let currentZoneTreeData = null;
 
 function initPartBComposite() {
-    renderZoneTree();
+    const btnShutdown = document.getElementById('btnPowerShutdown');
+    const btnRestore = document.getElementById('btnPowerRestore');
+    const btnUsage = document.getElementById('btnReportUsage');
 
-    const btnShutdown = document.getElementById('btnZoneShutdown');
-    const btnRestore = document.getElementById('btnZoneRestore');
-    const btnReport = document.getElementById('btnZoneReport');
+    function loadBackendZoneTree() {
+        fetch('/api/zones/tree')
+            .then(res => res.json())
+            .then(tree => {
+                currentZoneTreeData = tree;
+                if (!selectedZoneNode) selectedZoneNode = tree;
+                renderZoneTreeFromData(tree);
+            })
+            .catch(() => {
+                currentZoneTreeData = getFallbackCityHierarchy();
+                if (!selectedZoneNode) selectedZoneNode = currentZoneTreeData;
+                renderZoneTreeFromData(currentZoneTreeData);
+            });
+    }
 
-    if (btnShutdown) {
-        btnShutdown.addEventListener('click', () => {
-            logZoneExecution(`[COMMAND: SHUTDOWN_POWER] -> Target: "${selectedZoneNode.name}" (${selectedZoneNode.type})`);
-            recursivePowerCommand(selectedZoneNode, false);
-            renderZoneTree();
-            showNotification(`Shutdown command executed on ${selectedZoneNode.name}!`, 'danger');
+    function dispatchZoneCommand(cmd) {
+        if (!selectedZoneNode) return;
+        const targetId = selectedZoneNode.id || 'CITY-METRO';
+
+        fetch('/api/zones/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ targetId: targetId, command: cmd })
+        })
+        .then(res => res.json())
+        .then(data => {
+            logZoneExecution(data.log);
+            if (data.tree) {
+                currentZoneTreeData = data.tree;
+                updateSelectedNodeReference(currentZoneTreeData, targetId);
+                renderZoneTreeFromData(currentZoneTreeData);
+            }
+            showNotification(`Composite Command ${cmd} Executed on ${selectedZoneNode.name}!`, 'success');
+        })
+        .catch(() => {
+            if (cmd === 'SHUTDOWN') recursivePowerCommand(selectedZoneNode, false);
+            if (cmd === 'RESTORE') recursivePowerCommand(selectedZoneNode, true);
+            if (cmd === 'REPORT_USAGE') {
+                const total = recursiveCalculateUsage(selectedZoneNode);
+                logZoneExecution(`[LOCAL] Total usage for ${selectedZoneNode.name}: ${total.toFixed(1)} kWh`);
+            }
+            renderZoneTreeFromData(currentZoneTreeData);
+            showNotification(`Executed ${cmd} on ${selectedZoneNode.name}`, 'info');
         });
     }
 
-    if (btnRestore) {
-        btnRestore.addEventListener('click', () => {
-            logZoneExecution(`[COMMAND: RESTORE_POWER] -> Target: "${selectedZoneNode.name}" (${selectedZoneNode.type})`);
-            recursivePowerCommand(selectedZoneNode, true);
-            renderZoneTree();
-            showNotification(`Power restored to ${selectedZoneNode.name}!`, 'success');
-        });
-    }
+    if (btnShutdown) btnShutdown.addEventListener('click', () => dispatchZoneCommand('SHUTDOWN'));
+    if (btnRestore) btnRestore.addEventListener('click', () => dispatchZoneCommand('RESTORE'));
+    if (btnUsage) btnUsage.addEventListener('click', () => dispatchZoneCommand('REPORT_USAGE'));
 
-    if (btnReport) {
-        btnReport.addEventListener('click', () => {
-            logZoneExecution(`[COMMAND: REPORT_USAGE] Aggregating usage recursively for "${selectedZoneNode.name}"`);
-            const total = recursiveCalculateUsage(selectedZoneNode);
-            logZoneExecution(`--> Total aggregated usage = ${total.toLocaleString()} kWh`);
-            showNotification(`Total Usage: ${total.toLocaleString()} kWh`, 'info');
-        });
+    loadBackendZoneTree();
+}
+
+function updateSelectedNodeReference(root, targetId) {
+    if (!root) return;
+    if (root.id === targetId) {
+        selectedZoneNode = root;
+        return;
+    }
+    if (root.children) {
+        for (const child of root.children) {
+            updateSelectedNodeReference(child, targetId);
+        }
     }
 }
 
-function renderZoneTree() {
-    const container = document.getElementById('zoneTreeContainer');
-    if (!container) return;
+function renderZoneTreeFromData(rootNode) {
+    const container = document.getElementById('zoneTreeHierarchy');
+    if (!container || !rootNode) return;
     container.innerHTML = '';
 
     function buildNodeHtml(node) {
-        const isSelected = selectedZoneNode && selectedZoneNode.id === node.id;
         const isComposite = node.children && node.children.length > 0;
-        const icon = isComposite ? 'fa-folder-tree' : 'fa-building';
+        const isSelected = selectedZoneNode && selectedZoneNode.id === node.id;
+        const icon = isComposite ? (node.type && node.type.includes('District') ? 'fa-building-shield' : 'fa-network-wired') : 'fa-building';
 
         const wrapper = document.createElement('div');
         wrapper.className = 'light-tree-item';
@@ -326,13 +349,16 @@ function renderZoneTree() {
             selectedZoneNode = node;
             const badge = document.getElementById('selectedZoneBadge');
             if (badge) badge.textContent = `Target: ${node.name}`;
-            renderZoneTree();
+            renderZoneTreeFromData(currentZoneTreeData);
         };
+
+        const usage = node.currentUsageKWh !== undefined ? `${node.currentUsageKWh.toFixed(1)} kWh` : '';
 
         header.innerHTML = `
             <i class="fas ${icon}" style="color: ${isComposite ? 'var(--accent-lime)' : 'var(--text-muted)'}; font-size: 13px;"></i>
             <span style="font-size: 13px; font-weight: 600;">${node.name}</span>
-            <span style="font-size: 10px; color: var(--text-dim);">(${isComposite ? 'Composite' : 'Leaf'})</span>
+            <span style="font-size: 10px; color: var(--text-dim);">${node.type || (isComposite ? 'Composite' : 'Leaf')}</span>
+            ${usage ? `<span style="font-size: 11px; font-weight: 700; color: #0284c7; margin-left: 8px;">${usage}</span>` : ''}
             <span class="history-status-badge ${node.powerStatus ? 'completed' : 'declined'}" style="margin-left: auto;">
                 ${node.powerStatus ? 'ONLINE' : 'CUT OFF'}
             </span>
@@ -349,7 +375,16 @@ function renderZoneTree() {
         return wrapper;
     }
 
-    container.appendChild(buildNodeHtml(cityHierarchyData));
+    container.appendChild(buildNodeHtml(rootNode));
+}
+
+function logZoneExecution(msg) {
+    const consoleEl = document.getElementById('zoneExecutionConsole');
+    if (!consoleEl) return;
+    const div = document.createElement('div');
+    div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    consoleEl.appendChild(div);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
 }
 
 function recursivePowerCommand(node, status) {
@@ -362,25 +397,73 @@ function recursivePowerCommand(node, status) {
 
 function recursiveCalculateUsage(node) {
     let sum = 0;
-    if (node.kwh) {
-        sum += node.kwh;
-        logZoneExecution(`    [Leaf: ${node.name}] -> reportUsage(): ${node.kwh} kWh`);
-    } else if (node.children) {
+    if (node.currentUsageKWh !== undefined) {
+        sum += node.powerStatus ? node.currentUsageKWh : 0;
+    } else if (node.kwh) {
+        sum += node.powerStatus ? node.kwh : 0;
+    }
+    if (node.children) {
         node.children.forEach(c => {
             sum += recursiveCalculateUsage(c);
         });
-        logZoneExecution(`  [Composite: ${node.name}] -> subtotal: ${sum} kWh`);
     }
     return sum;
 }
 
-function logZoneExecution(msg) {
-    const consoleEl = document.getElementById('zoneExecutionConsole');
-    if (!consoleEl) return;
-    const div = document.createElement('div');
-    div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-    consoleEl.appendChild(div);
-    consoleEl.scrollTop = consoleEl.scrollHeight;
+function getFallbackCityHierarchy() {
+    return {
+        id: "CITY-METRO",
+        name: "Metropolis City",
+        type: "City (Composite)",
+        powerStatus: true,
+        children: [
+            {
+                id: "DIST-COMM",
+                name: "Downtown Commercial District",
+                type: "District (Composite)",
+                powerStatus: true,
+                children: [
+                    {
+                        id: "STR-SILICON",
+                        name: "Silicon Boulevard",
+                        type: "Street (Composite)",
+                        powerStatus: true,
+                        children: [
+                            { id: "BLD-TECH", name: "Tech Tower Alpha", type: "Building (Leaf)", powerStatus: true, kwh: 1540.5 },
+                            { id: "BLD-INNOV", name: "Innovation Hub Beta", type: "Building (Leaf)", powerStatus: true, kwh: 980.2 }
+                        ]
+                    },
+                    {
+                        id: "STR-FIN",
+                        name: "Financial Plaza",
+                        type: "Street (Composite)",
+                        powerStatus: true,
+                        children: [
+                            { id: "BLD-BANK", name: "Metro Central Bank", type: "Building (Leaf)", powerStatus: true, kwh: 2100.0 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "DIST-RES",
+                name: "Green Valley Residential District",
+                type: "District (Composite)",
+                powerStatus: true,
+                children: [
+                    {
+                        id: "STR-MAPLE",
+                        name: "Maple Garden Way",
+                        type: "Street (Composite)",
+                        powerStatus: true,
+                        children: [
+                            { id: "BLD-SOLAR-A", name: "Solar Heights A", type: "Building (Leaf)", powerStatus: true, kwh: 320.0 },
+                            { id: "BLD-SOLAR-B", name: "Solar Heights B", type: "Building (Leaf)", powerStatus: true, kwh: 280.0 }
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
 }
 
 function initPartCChain() {
@@ -390,11 +473,11 @@ function initPartCChain() {
     const btnDispatch = document.getElementById('btnDispatchComplaint');
 
     const descriptions = {
-        1: { label: 'Level 1: Minor', desc: 'Cosmetic damage, pothole. Handled by Local Staff.' },
-        2: { label: 'Level 2: Routine', desc: 'Garbage collection delay. Handled by Local Staff.' },
-        3: { label: 'Level 3: Moderate', desc: 'Traffic light outage. Handled by Field Supervisor.' },
-        4: { label: 'Level 4: High Impact', desc: 'Water main rupture. Handled by Field Supervisor.' },
-        5: { label: 'Level 5: Critical', desc: 'Bridge failure, emergency. Escalate to City Manager!' }
+        1: { label: 'Level 1: Minor', desc: 'Routine civic maintenance (Potholes, flickering lights). Handled by Local Staff.' },
+        2: { label: 'Level 2: Routine', desc: 'Garbage collection delay, littering. Handled by Local Staff.' },
+        3: { label: 'Level 3: Moderate', desc: 'Traffic grid failure, water main rupture. Handled by Field Supervisor.' },
+        4: { label: 'Level 4: High Impact', desc: 'Electrical substation trip, road closure. Handled by Field Supervisor.' },
+        5: { label: 'Level 5: Critical', desc: 'Bridge structural failure, disaster alert. Escalate to City Manager!' }
     };
 
     if (slider) {
@@ -405,75 +488,119 @@ function initPartCChain() {
         });
     }
 
+    function loadAuditHistory() {
+        fetch('/api/complaints/audit')
+            .then(res => res.json())
+            .then(list => {
+                const tbody = document.getElementById('complaintHistoryTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (list && list.length > 0) {
+                    list.forEach(c => addComplaintHistoryRow(c.ticketId, c.citizenName, c.category, c.severity, c.handledBy, c.resolved ? 'RESOLVED' : 'PENDING'));
+                } else {
+                    renderEmptyComplaintRow();
+                }
+            })
+            .catch(() => {
+                renderEmptyComplaintRow();
+            });
+    }
+
+    function renderEmptyComplaintRow() {
+        const tbody = document.getElementById('complaintHistoryTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = `
+            <tr id="emptyComplaintRow">
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 28px 12px; font-size: 12px;">
+                    <i class="fas fa-inbox" style="font-size: 20px; color: #cbd5e1; display: block; margin-bottom: 6px;"></i>
+                    No complaints dispatched yet. Submit a resident grievance above to route dynamically through the Chain of Responsibility.
+                </td>
+            </tr>
+        `;
+    }
+
     if (btnDispatch) {
         btnDispatch.addEventListener('click', () => {
             const citizen = document.getElementById('citizenNameInput')?.value || 'Kasun Perera';
-            const category = document.getElementById('complaintCategorySelect')?.value || 'INFRASTRUCTURE';
+            const category = document.getElementById('complaintCategorySelect')?.value || 'Civil Infrastructure';
             const sev = parseInt(slider.value, 10);
 
-            dispatchComplaintThroughChain(citizen, category, sev);
+            btnDispatch.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Escalating through Chain...';
+            btnDispatch.disabled = true;
+
+            fetch('/api/complaints/dispatch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    citizenName: citizen,
+                    category: category,
+                    description: `Citizen grievance reported under category ${category}`,
+                    severity: sev
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const emptyRow = document.getElementById('emptyComplaintRow');
+                if (emptyRow) emptyRow.remove();
+
+                addComplaintHistoryRow(data.ticketId, data.citizenName, data.category, data.severity, data.handledBy, data.resolved ? 'RESOLVED' : 'PENDING');
+                showNotification(`Ticket ${data.ticketId} escalated & resolved by ${data.handledBy}!`, 'success');
+            })
+            .catch(() => {
+                const emptyRow = document.getElementById('emptyComplaintRow');
+                if (emptyRow) emptyRow.remove();
+
+                const handlers = {
+                    1: 'Local Staff',
+                    2: 'Local Staff',
+                    3: 'Field Supervisor',
+                    4: 'Field Supervisor',
+                    5: 'City Manager'
+                };
+                const pseudoId = 'TKT-' + Math.floor(1000 + Math.random() * 9000);
+                addComplaintHistoryRow(pseudoId, citizen, category, sev, handlers[sev] || 'City Manager', 'RESOLVED');
+                showNotification(`Ticket resolved by ${handlers[sev]}!`, 'success');
+            })
+            .finally(() => {
+                btnDispatch.innerHTML = '<i class="fas fa-paper-plane"></i> Dispatch to Escalation Chain';
+                btnDispatch.disabled = false;
+            });
         });
     }
 
-    addComplaintHistoryRow('Nimal Silva', 'INFRASTRUCTURE', 1, 'Local Staff', 'RESOLVED');
-    addComplaintHistoryRow('Dilshan Fernando', 'POWER_GRID', 4, 'Field Supervisor', 'RESOLVED');
+    loadAuditHistory();
 }
 
-function dispatchComplaintThroughChain(citizen, category, sev) {
-    const stnStaff = document.getElementById('stationStaff');
-    const stnSupervisor = document.getElementById('stationSupervisor');
-    const stnManager = document.getElementById('stationManager');
-
-    [stnStaff, stnSupervisor, stnManager].forEach(s => {
-        if (s) s.style.boxShadow = 'none';
-    });
-
-    if (stnStaff) stnStaff.style.boxShadow = '0 0 0 2px var(--accent-lime)';
-
-    setTimeout(() => {
-        if (sev <= 2) {
-            addComplaintHistoryRow(citizen, category, sev, 'Local Staff Handler', 'RESOLVED');
-            showNotification(`Severity ${sev} handled locally by Local Staff!`, 'success');
-        } else {
-            if (stnStaff) stnStaff.style.boxShadow = 'none';
-            if (stnSupervisor) stnSupervisor.style.boxShadow = '0 0 0 2px var(--accent-yellow)';
-            setTimeout(() => {
-                if (sev <= 4) {
-                    addComplaintHistoryRow(citizen, category, sev, 'Field Supervisor Handler', 'RESOLVED');
-                    showNotification(`Severity ${sev} escalated and resolved by Field Supervisor!`, 'success');
-                } else {
-                    if (stnSupervisor) stnSupervisor.style.boxShadow = 'none';
-                    if (stnManager) stnManager.style.boxShadow = '0 0 0 2px var(--accent-orange)';
-                    setTimeout(() => {
-                        addComplaintHistoryRow(citizen, category, sev, 'City Manager Handler', 'EXECUTIVE ACTION');
-                        showNotification(`Level 5 Emergency handled directly by City Manager!`, 'danger');
-                    }, 500);
-                }
-            }, 500);
-        }
-    }, 450);
-}
-
-function addComplaintHistoryRow(citizen, cat, sev, handler, status) {
+function addComplaintHistoryRow(id, citizen, category, sev, handler, status) {
     const tbody = document.getElementById('complaintHistoryTableBody');
     if (!tbody) return;
-    const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid var(--border-card)';
-    tr.innerHTML = `
-        <td style="padding: 8px; font-family: var(--font-mono); font-size: 11px;">#TKT-${Math.floor(1000 + Math.random()*9000)}</td>
-        <td style="padding: 8px; font-weight: 600;">${citizen}</td>
-        <td style="padding: 8px;"><span class="history-status-badge pending">${cat}</span></td>
-        <td style="padding: 8px; font-weight: 700; color: ${sev >= 4 ? 'var(--accent-orange)' : 'var(--accent-lime)'};">Level ${sev}</td>
-        <td style="padding: 8px; font-size: 12px; color: var(--text-body);">${handler}</td>
-        <td style="padding: 8px;"><span class="history-status-badge completed">${status}</span></td>
+
+    const row = document.createElement('tr');
+    row.style.borderBottom = '1px solid var(--border-subtle)';
+
+    const sevColors = {
+        1: '#16a34a',
+        2: '#65a30d',
+        3: '#ea580c',
+        4: '#dc2626',
+        5: '#b91c1c'
+    };
+
+    row.innerHTML = `
+        <td style="padding: 10px 8px; font-weight: 700; font-family: var(--font-mono); color: var(--text-main);">${id}</td>
+        <td style="padding: 10px 8px; font-weight: 600;">${citizen}</td>
+        <td style="padding: 10px 8px;"><span style="font-size: 10.5px; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 7px; border-radius: 4px;">${category}</span></td>
+        <td style="padding: 10px 8px; font-weight: 700; color: ${sevColors[sev] || '#16a34a'};">Level ${sev}</td>
+        <td style="padding: 10px 8px; font-weight: 600; color: var(--text-main);">${handler}</td>
+        <td style="padding: 10px 8px;"><span class="history-status-badge completed">${status}</span></td>
     `;
-    tbody.insertBefore(tr, tbody.firstChild);
+
+    tbody.insertBefore(row, tbody.firstChild);
 }
 
 let fleetCount = 50000;
-let streetLightNodes = [];
 let lightsOn = true;
-
+let streetLightNodes = [];
 let mapStyleMode = 'map';
 let mapZoom = 1.0;
 let mapPanX = 0;
@@ -543,13 +670,32 @@ function initPartDFlyweight() {
 
     if (btnSpawn) {
         btnSpawn.addEventListener('click', () => {
-            btnSpawn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Spawning...';
-            setTimeout(() => {
-                updateMemoryCalc();
-                renderFlyweightCanvas();
-                btnSpawn.innerHTML = '<i class="fas fa-microchip"></i> Spawn & Profile Fleet';
-                showNotification(`Allocated ${fleetCount.toLocaleString()} Streetlights via Flyweight Factory!`, 'success');
-            }, 400);
+            btnSpawn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Profiling Fleet via Flyweight Factory...';
+            btnSpawn.disabled = true;
+
+            fetch(`/api/fleet/profile?count=${fleetCount}`)
+                .then(res => res.json())
+                .then(data => {
+                    const elUnopt = document.getElementById('ramWithoutFlyweight');
+                    const elFly = document.getElementById('ramWithFlyweight');
+                    const elSave = document.getElementById('ramSavingsPercent');
+
+                    if (elUnopt) elUnopt.textContent = data.unoptimizedHeapMB + ' MB';
+                    if (elFly) elFly.textContent = data.flyweightHeapMB + ' MB';
+                    if (elSave) elSave.textContent = data.memoryReductionPercentage + '%';
+
+                    renderFlyweightCanvas();
+                    showNotification(`Allocated ${data.fleetCount.toLocaleString()} nodes using ${data.sharedFlyweightTypesCount} shared Flyweights (${data.memoryReductionPercentage}% RAM saved)!`, 'success');
+                })
+                .catch(() => {
+                    updateMemoryCalc();
+                    renderFlyweightCanvas();
+                    showNotification(`Allocated ${fleetCount.toLocaleString()} Streetlights via Flyweight Factory!`, 'success');
+                })
+                .finally(() => {
+                    btnSpawn.innerHTML = '<i class="fas fa-microchip"></i> Spawn & Profile Fleet';
+                    btnSpawn.disabled = false;
+                });
         });
     }
 
@@ -561,6 +707,13 @@ function initPartDFlyweight() {
                 badge.textContent = lightsOn ? 'All Lights ON (100% Lumens)' : 'All Lights OFF (Standby)';
                 badge.className = `history-status-badge ${lightsOn ? 'completed' : 'declined'}`;
             }
+
+            fetch('/api/fleet/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ turnOn: lightsOn, brightness: 100 })
+            }).catch(() => {});
+
             renderFlyweightCanvas();
             showNotification(`Toggled extrinsic state: Lights turned ${lightsOn ? 'ON' : 'OFF'} across fleet!`, 'info');
         });
@@ -658,17 +811,30 @@ function initPartDFlyweight() {
 }
 
 function updateMemoryCalc() {
-    const unoptMB = ((fleetCount * 920) / (1024 * 1024)).toFixed(1);
-    const flyMB = (((3 * 800) + (fleetCount * 38)) / (1024 * 1024)).toFixed(2);
-    const savings = (((fleetCount * 920 - ((3 * 800) + (fleetCount * 38))) / (fleetCount * 920)) * 100).toFixed(1);
+    fetch(`/api/fleet/profile?count=${fleetCount}`)
+        .then(res => res.json())
+        .then(data => {
+            const elUnopt = document.getElementById('ramWithoutFlyweight');
+            const elFly = document.getElementById('ramWithFlyweight');
+            const elSave = document.getElementById('ramSavingsPercent');
 
-    const elUnopt = document.getElementById('ramWithoutFlyweight');
-    const elFly = document.getElementById('ramWithFlyweight');
-    const elSave = document.getElementById('ramSavingsPercent');
+            if (elUnopt) elUnopt.textContent = data.unoptimizedHeapMB + ' MB';
+            if (elFly) elFly.textContent = data.flyweightHeapMB + ' MB';
+            if (elSave) elSave.textContent = data.memoryReductionPercentage + '%';
+        })
+        .catch(() => {
+            const unoptMB = ((fleetCount * 920) / (1024 * 1024)).toFixed(1);
+            const flyMB = (((3 * 800) + (fleetCount * 38)) / (1024 * 1024)).toFixed(2);
+            const savings = (((fleetCount * 920 - ((3 * 800) + (fleetCount * 38))) / (fleetCount * 920)) * 100).toFixed(1);
 
-    if (elUnopt) elUnopt.textContent = unoptMB + ' MB';
-    if (elFly) elFly.textContent = flyMB + ' MB';
-    if (elSave) elSave.textContent = savings + '%';
+            const elUnopt = document.getElementById('ramWithoutFlyweight');
+            const elFly = document.getElementById('ramWithFlyweight');
+            const elSave = document.getElementById('ramSavingsPercent');
+
+            if (elUnopt) elUnopt.textContent = unoptMB + ' MB';
+            if (elFly) elFly.textContent = flyMB + ' MB';
+            if (elSave) elSave.textContent = savings + '%';
+        });
 }
 
 function renderFlyweightCanvas() {
@@ -976,16 +1142,15 @@ function renderFlyweightCanvas() {
     ctx.restore();
 }
 
-
 function initPartEInterpreter() {
     const preset = document.getElementById('dslRulePreset');
     const input = document.getElementById('dslRuleInput');
     const btn = document.getElementById('btnEvaluateDSL');
 
     const rules = {
-        noise: 'IF (ZONE == "RESIDENTIAL" AND NOISE_LEVEL > 65) THEN VIOLATION',
-        parking: 'IF (TIME >= "22:00" AND PARKING_STATUS == "OCCUPIED") THEN FINE',
-        environmental: 'IF (AIR_QUALITY_INDEX > 150 OR TEMPERATURE > 40) THEN ALERT_HEALTH'
+        noise: 'ZONE == "RESIDENTIAL" AND NOISE_LEVEL > 65',
+        commercial: 'ZONE == "COMMERCIAL" AND NOISE_LEVEL > 80',
+        quiet: 'ZONE == "RESIDENTIAL" AND NOISE_LEVEL <= 55'
     };
 
     if (preset && input) {
@@ -996,42 +1161,139 @@ function initPartEInterpreter() {
 
     if (btn) {
         btn.addEventListener('click', () => {
-            const rule = input?.value || '';
+            const dslRule = input?.value || 'ZONE == "RESIDENTIAL" AND NOISE_LEVEL > 65';
             const zone = document.getElementById('ctxZoneSelect')?.value || 'RESIDENTIAL';
             const noise = parseFloat(document.getElementById('ctxNoiseInput')?.value || 74);
 
-            const isViolation = (zone === 'RESIDENTIAL' && noise > 65);
-            const astEl = document.getElementById('astTreeVisualizer');
-            const badge = document.getElementById('dslVerdictBadge');
-            const detail = document.getElementById('dslVerdictDetail');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Parsing AST via Backend Interpreter...';
+            btn.disabled = true;
 
-            if (astEl) {
-                astEl.innerHTML = `
-                    <div style="font-weight: 700; color: #4338ca;">[NonTerminalExpression: AND]</div>
-                    <div style="margin-left: 18px; border-left: 2px dashed #cbd5e1; padding-left: 10px; margin-top: 4px;">
-                        <div>[Terminal: EqualityExpression] (ZONE == "RESIDENTIAL") ➔ <strong style="color: #16a34a;">${zone === 'RESIDENTIAL'}</strong></div>
-                        <div style="margin-top: 4px;">[Terminal: GreaterThanExpression] (NOISE_LEVEL > 65) ➔ <strong style="color: ${noise > 65 ? '#dc2626' : '#16a34a'};">${noise > 65}</strong> (${noise} dB)</div>
-                    </div>
-                `;
-            }
+            fetch('/api/policy/evaluate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dsl: dslRule,
+                    telemetry: {
+                        ZONE: zone,
+                        NOISE_LEVEL: noise,
+                        NOISE_DB: noise
+                    }
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const astEl = document.getElementById('astTreeVisualizer');
+                const badge = document.getElementById('dslVerdictBadge');
+                const detail = document.getElementById('dslVerdictDetail');
 
-            if (badge) {
-                if (isViolation) {
-                    badge.className = 'btn-clean-danger';
-                    badge.textContent = 'POLICY VIOLATION TRIGGERED';
-                } else {
-                    badge.className = 'btn-clean-success';
-                    badge.textContent = 'POLICY COMPLIANT (PASS)';
+                if (astEl) {
+                    astEl.innerHTML = `
+                        <div style="font-weight: 700; color: #4338ca; margin-bottom: 6px;">
+                            <i class="fas fa-tree"></i> Parsed GoF AST Representation:
+                        </div>
+                        <div style="background: #ffffff; padding: 10px 14px; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 600; color: #1e293b; margin-bottom: 8px;">
+                            ${escapeHtml(data.astRepresentation || dslRule)}
+                        </div>
+                        <div style="margin-left: 12px; border-left: 2px dashed #cbd5e1; padding-left: 10px; font-size: 11.5px; color: #475569;">
+                            <div>• Terminal Evaluator (ZONE == "${zone}") ➔ <strong style="color: #16a34a;">MATCHED</strong></div>
+                            <div>• Terminal Evaluator (NOISE_LEVEL ${noise} dB) ➔ <strong>EVALUATED</strong></div>
+                            <div>• Root Interpretation Status ➔ <strong style="color: ${data.compliant ? '#16a34a' : '#dc2626'};">${data.status}</strong></div>
+                        </div>
+                    `;
                 }
-            }
 
-            if (detail) {
-                detail.textContent = isViolation 
-                    ? `Noise level of ${noise} dB in ${zone} exceeds 65 dB municipal threshold.`
-                    : `Current sensor readings are compliant with city policy.`;
-            }
+                if (badge) {
+                    if (!data.compliant) {
+                        badge.className = 'btn-clean-danger';
+                        badge.textContent = 'POLICY VIOLATION TRIGGERED';
+                    } else {
+                        badge.className = 'btn-clean-success';
+                        badge.textContent = 'POLICY COMPLIANT (PASS)';
+                    }
+                }
+
+                if (detail) {
+                    detail.textContent = !data.compliant
+                        ? `Live sensor telemetry (${zone}, ${noise} dB) violates rule: ${dslRule}`
+                        : `Current sensor readings are strictly compliant with municipal bylaws.`;
+                }
+
+                showNotification(`DSL Rule Parsed & Evaluated via Java Interpreter Pattern: ${data.status}!`, data.compliant ? 'success' : 'danger');
+            })
+            .catch(() => {
+                const isViolation = (zone === 'RESIDENTIAL' && noise > 65);
+                const astEl = document.getElementById('astTreeVisualizer');
+                const badge = document.getElementById('dslVerdictBadge');
+                const detail = document.getElementById('dslVerdictDetail');
+
+                if (astEl) {
+                    astEl.innerHTML = `
+                        <div style="font-weight: 700; color: #4338ca;">[NonTerminalExpression: AND]</div>
+                        <div style="margin-left: 18px; border-left: 2px dashed #cbd5e1; padding-left: 10px; margin-top: 4px;">
+                            <div>[Terminal: EqualityExpression] (ZONE == "${zone}") ➔ <strong style="color: #16a34a;">true</strong></div>
+                            <div style="margin-top: 4px;">[Terminal: ComparisonExpression] (NOISE_LEVEL > 65) ➔ <strong style="color: ${noise > 65 ? '#dc2626' : '#16a34a'};">${noise > 65}</strong> (${noise} dB)</div>
+                        </div>
+                    `;
+                }
+
+                if (badge) {
+                    if (isViolation) {
+                        badge.className = 'btn-clean-danger';
+                        badge.textContent = 'POLICY VIOLATION TRIGGERED';
+                    } else {
+                        badge.className = 'btn-clean-success';
+                        badge.textContent = 'POLICY COMPLIANT (PASS)';
+                    }
+                }
+
+                if (detail) {
+                    detail.textContent = isViolation 
+                        ? `Noise level of ${noise} dB in ${zone} exceeds 65 dB municipal threshold.`
+                        : `Current sensor readings are compliant with city policy.`;
+                }
+            })
+            .finally(() => {
+                btn.innerHTML = '<i class="fas fa-play"></i> Evaluate Rule Against Context';
+                btn.disabled = false;
+            });
         });
     }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function initChartInteractivity() {
+    const chartPolyline = document.getElementById('energyTrendLine');
+    const chartPoints = document.querySelectorAll('.chart-data-point');
+    const chartTooltip = document.getElementById('chartHoverTooltip');
+    const tipValue = document.getElementById('chartTipValue');
+    const tipDay = document.getElementById('chartTipDay');
+
+    if (!chartPoints.length || !chartTooltip) return;
+
+    chartPoints.forEach(pt => {
+        pt.addEventListener('mouseenter', (e) => {
+            const val = pt.getAttribute('data-value') || '12,450';
+            const day = pt.getAttribute('data-day') || 'Today';
+
+            if (tipValue) tipValue.textContent = `${val} kWh`;
+            if (tipDay) tipDay.textContent = day;
+
+            const cx = parseFloat(pt.getAttribute('cx') || 0);
+            const cy = parseFloat(pt.getAttribute('cy') || 0);
+
+            chartTooltip.style.display = 'block';
+            chartTooltip.style.left = `${(cx / 560) * 100}%`;
+            chartTooltip.style.top = `${cy - 12}px`;
+        });
+
+        pt.addEventListener('mouseleave', () => {
+            chartTooltip.style.display = 'none';
+        });
+    });
 }
 
 function showNotification(msg, type = 'info') {
@@ -1064,90 +1326,4 @@ function showNotification(msg, type = 'info') {
 
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3200);
-}
-
-function initChartInteractivity() {
-    const container = document.getElementById('energyChartContainer');
-    const tooltip = document.getElementById('chartTooltip');
-    const arrow = document.getElementById('tooltipArrow');
-    if (!container || !tooltip) return;
-
-    const columns = container.querySelectorAll('.bar-day-column');
-    const dateEl = document.getElementById('tooltipDate');
-    const resEl = document.getElementById('tooltipResidential');
-    const commEl = document.getElementById('tooltipCommercial');
-    const indEl = document.getElementById('tooltipIndustrial');
-    const indRow = document.getElementById('tooltipIndustrialRow');
-    const totalEl = document.getElementById('tooltipTotal');
-
-    function updateTooltip(col) {
-        if (!col) return;
-        const colRect = col.getBoundingClientRect();
-        const contRect = container.getBoundingClientRect();
-
-        const colCenter = (colRect.left - contRect.left) + (colRect.width / 2);
-
-        const tipWidth = tooltip.offsetWidth || 185;
-        const halfWidth = tipWidth / 2;
-        const contWidth = contRect.width;
-
-        const minLeft = halfWidth + 12;
-        const maxLeft = contWidth - halfWidth - 12;
-        const clampedLeft = Math.max(minLeft, Math.min(maxLeft, colCenter));
-        
-        tooltip.style.left = `${clampedLeft}px`;
-
-        if (arrow) {
-            const arrowOffset = colCenter - clampedLeft;
-            arrow.style.left = `calc(50% + ${arrowOffset}px)`;
-        }
-
-        if (dateEl) dateEl.textContent = col.getAttribute('data-date') || '';
-        if (resEl) resEl.textContent = col.getAttribute('data-res') || '0 kWh';
-        if (commEl) commEl.textContent = col.getAttribute('data-comm') || '0 kWh';
-
-        const indVal = col.getAttribute('data-ind');
-        if (indRow && indEl) {
-            if (indVal && indVal !== '0 kWh') {
-                indRow.style.display = 'flex';
-                indEl.textContent = indVal;
-            } else {
-                indRow.style.display = 'none';
-            }
-        }
-
-        if (totalEl) totalEl.textContent = col.getAttribute('data-total') || '';
-        tooltip.style.opacity = '1';
-
-        columns.forEach(c => {
-            c.classList.remove('active');
-            const track = c.querySelector('.bar-track');
-            if (track) track.classList.remove('active-day');
-        });
-
-        col.classList.add('active');
-        const activeTrack = col.querySelector('.bar-track');
-        if (activeTrack) activeTrack.classList.add('active-day');
-    }
-
-    columns.forEach(col => {
-        col.addEventListener('mouseenter', () => updateTooltip(col));
-        col.addEventListener('click', () => updateTooltip(col));
-    });
-
-    const defaultCol = container.querySelector('.bar-day-column[data-day="Wed"]') || columns[3];
-    if (defaultCol) {
-        setTimeout(() => updateTooltip(defaultCol), 150);
-    }
-
-    container.addEventListener('mouseleave', () => {
-        if (defaultCol) {
-            updateTooltip(defaultCol);
-        }
-    });
-
-    window.addEventListener('resize', () => {
-        const activeCol = container.querySelector('.bar-day-column.active') || defaultCol;
-        if (activeCol) updateTooltip(activeCol);
-    });
 }
