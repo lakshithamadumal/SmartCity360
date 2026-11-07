@@ -418,12 +418,64 @@ let fleetCount = 50000;
 let streetLightNodes = [];
 let lightsOn = true;
 
+let mapStyleMode = 'map';
+let mapZoom = 1.0;
+let mapPanX = 0;
+let mapPanY = 0;
+let isDraggingMap = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
 function initPartDFlyweight() {
     const fleetSelect = document.getElementById('fleetCountSelect');
     const btnSpawn = document.getElementById('btnSpawnFleet');
     const btnToggle = document.getElementById('btnToggleLights');
     const canvas = document.getElementById('fleetCanvas');
     const tooltip = document.getElementById('streetlightTooltip');
+
+    const btnVector = document.getElementById('btnMapStyleVector');
+    const btnSatellite = document.getElementById('btnMapStyleSatellite');
+    const btnZoomIn = document.getElementById('btnMapZoomIn');
+    const btnZoomOut = document.getElementById('btnMapZoomOut');
+    const btnRecenter = document.getElementById('btnMapRecenter');
+
+    if (btnVector && btnSatellite) {
+        btnVector.addEventListener('click', () => {
+            mapStyleMode = 'map';
+            btnVector.classList.add('active');
+            btnSatellite.classList.remove('active');
+            renderFlyweightCanvas();
+        });
+        btnSatellite.addEventListener('click', () => {
+            mapStyleMode = 'satellite';
+            btnSatellite.classList.add('active');
+            btnVector.classList.remove('active');
+            renderFlyweightCanvas();
+        });
+    }
+
+    if (btnZoomIn) {
+        btnZoomIn.addEventListener('click', () => {
+            mapZoom = Math.min(2.5, +(mapZoom + 0.2).toFixed(2));
+            renderFlyweightCanvas();
+        });
+    }
+
+    if (btnZoomOut) {
+        btnZoomOut.addEventListener('click', () => {
+            mapZoom = Math.max(0.7, +(mapZoom - 0.2).toFixed(2));
+            renderFlyweightCanvas();
+        });
+    }
+
+    if (btnRecenter) {
+        btnRecenter.addEventListener('click', () => {
+            mapZoom = 1.0;
+            mapPanX = 0;
+            mapPanY = 0;
+            renderFlyweightCanvas();
+        });
+    }
 
     if (fleetSelect) {
         fleetSelect.addEventListener('change', () => {
@@ -459,16 +511,48 @@ function initPartDFlyweight() {
     }
 
     if (canvas && tooltip) {
+        canvas.addEventListener('mousedown', (e) => {
+            isDraggingMap = true;
+            dragStartX = e.clientX - mapPanX;
+            dragStartY = e.clientY - mapPanY;
+            canvas.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDraggingMap) {
+                isDraggingMap = false;
+                canvas.style.cursor = 'grab';
+            }
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            mapZoom = Math.max(0.7, Math.min(2.5, +(mapZoom + delta).toFixed(2)));
+            renderFlyweightCanvas();
+        }, { passive: false });
+
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
+            const rawMx = e.clientX - rect.left;
+            const rawMy = e.clientY - rect.top;
+
+            if (isDraggingMap) {
+                mapPanX = e.clientX - dragStartX;
+                mapPanY = e.clientY - dragStartY;
+                tooltip.style.display = 'none';
+                renderFlyweightCanvas();
+                return;
+            }
+
+            const transformedMx = (rawMx - mapPanX) / mapZoom;
+            const transformedMy = (rawMy - mapPanY) / mapZoom;
 
             let closest = null;
-            let minDist = 18;
+            let minDist = 16 / mapZoom;
 
             for (const node of streetLightNodes) {
-                const dist = Math.hypot(node.x - mx, node.y - my);
+                const dist = Math.hypot(node.worldX - transformedMx, node.worldY - transformedMy);
                 if (dist < minDist) {
                     minDist = dist;
                     closest = node;
@@ -476,13 +560,18 @@ function initPartDFlyweight() {
             }
 
             if (closest) {
+                const screenX = closest.worldX * mapZoom + mapPanX;
+                const screenY = closest.worldY * mapZoom + mapPanY;
+
                 tooltip.style.display = 'block';
-                tooltip.style.left = `${closest.x}px`;
-                tooltip.style.top = `${closest.y}px`;
+                tooltip.style.left = `${screenX}px`;
+                tooltip.style.top = `${screenY}px`;
 
                 const idEl = document.getElementById('slTipId');
                 const roadEl = document.getElementById('slTipRoad');
                 const typeEl = document.getElementById('slTipType');
+                const specsEl = document.getElementById('slTipSpecs');
+                const statusEl = document.getElementById('slTipStatus');
 
                 if (idEl) idEl.textContent = `#SL-${closest.id}`;
                 if (roadEl) roadEl.textContent = `Corridor: ${closest.road}`;
@@ -490,12 +579,20 @@ function initPartDFlyweight() {
                     typeEl.textContent = `Type: ${closest.typeName} (${closest.wattage}W)`;
                     typeEl.style.color = closest.color;
                 }
+                if (specsEl) specsEl.textContent = closest.specs;
+                if (statusEl) {
+                    statusEl.textContent = lightsOn ? 'LIVE ON' : 'STANDBY';
+                    statusEl.style.background = lightsOn ? '#dcfce7' : '#fee2e2';
+                    statusEl.style.color = lightsOn ? '#15803d' : '#b91c1c';
+                }
             } else {
                 tooltip.style.display = 'none';
             }
         });
 
         canvas.addEventListener('mouseleave', () => {
+            isDraggingMap = false;
+            canvas.style.cursor = 'grab';
             tooltip.style.display = 'none';
         });
     }
@@ -524,194 +621,305 @@ function renderFlyweightCanvas() {
     const ctx = canvas.getContext('2d');
 
     const width = canvas.parentElement.clientWidth || 600;
-    const height = canvas.parentElement.clientHeight || 320;
+    const height = canvas.parentElement.clientHeight || 380;
     canvas.width = width;
     canvas.height = height;
 
     streetLightNodes = [];
 
-    ctx.fillStyle = '#0b1120';
+    const isSat = mapStyleMode === 'satellite';
+
+    ctx.fillStyle = isSat ? '#091122' : '#f4f3f0';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = '#0f172a';
-    const blocks = [
-        { x: 12, y: 12, w: width * 0.22, h: height * 0.38, label: "COMMERCIAL ZONE A" },
-        { x: width * 0.30, y: 12, w: width * 0.18, h: height * 0.38, label: "CIVIC CENTER" },
-        { x: width * 0.56, y: 12, w: width * 0.18, h: height * 0.38, label: "TECH DISTRICT" },
-        { x: width * 0.82, y: 12, w: width * 0.16, h: height * 0.38, label: "NORTH PARK" },
-        { x: 12, y: height * 0.54, w: width * 0.22, h: height * 0.42, label: "METRO RESIDENTIAL" },
-        { x: width * 0.30, y: height * 0.54, w: width * 0.18, h: height * 0.42, label: "DOWNTOWN SOUTH" },
-        { x: width * 0.56, y: height * 0.54, w: width * 0.18, h: height * 0.42, label: "INNOVATION HUB" },
-        { x: width * 0.82, y: height * 0.54, w: width * 0.16, h: height * 0.42, label: "GREEN VALLEY PARK" }
+    ctx.save();
+    ctx.translate(mapPanX, mapPanY);
+    ctx.scale(mapZoom, mapZoom);
+
+    ctx.fillStyle = isSat ? '#03203c' : '#aad3df';
+    ctx.beginPath();
+    ctx.moveTo(width * 0.72, 0);
+    ctx.bezierCurveTo(width * 0.70, height * 0.35, width * 0.40, height * 0.65, width * 0.35, height);
+    ctx.lineTo(width * 0.48, height);
+    ctx.bezierCurveTo(width * 0.52, height * 0.65, width * 0.82, height * 0.35, width * 0.84, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = isSat ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.45)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 6]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.save();
+    ctx.translate(width * 0.61, height * 0.48);
+    ctx.rotate(Math.PI / 3.4);
+    ctx.fillStyle = isSat ? '#38bdf8' : '#477d8d';
+    ctx.font = 'italic 700 9px Inter, sans-serif';
+    ctx.letterSpacing = '1px';
+    ctx.fillText('~ METROPOLIS RIVER ~', 0, 0);
+    ctx.restore();
+
+    const parks = [
+        { x: width * 0.04, y: height * 0.05, w: width * 0.22, h: height * 0.32, label: 'Central Botanic Reserve' },
+        { x: width * 0.58, y: height * 0.60, w: width * 0.20, h: height * 0.34, label: 'Riverside Eco Park' }
     ];
 
-    blocks.forEach(b => {
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(b.x, b.y, b.w, b.h);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.strokeRect(b.x, b.y, b.w, b.h);
+    parks.forEach(p => {
+        ctx.fillStyle = isSat ? '#064e3b' : '#d7f0d0';
+        ctx.strokeStyle = isSat ? '#047857' : '#bbf7d0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(p.x, p.y, p.w, p.h, 8);
+        ctx.fill();
+        ctx.stroke();
 
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.25)';
-        ctx.font = '8px Inter, sans-serif';
-        ctx.fillText(b.label, b.x + 8, b.y + 16);
+        ctx.fillStyle = isSat ? '#34d399' : '#15803d';
+        ctx.font = '600 8.5px Inter, sans-serif';
+        ctx.fillText(p.label, p.x + 8, p.y + 16);
+
+        const trees = [
+            { tx: p.x + p.w * 0.25, ty: p.y + p.h * 0.55 },
+            { tx: p.x + p.w * 0.55, ty: p.y + p.h * 0.70 },
+            { tx: p.x + p.w * 0.75, ty: p.y + p.h * 0.45 }
+        ];
+        trees.forEach(t => {
+            ctx.fillStyle = isSat ? '#10b981' : '#86efac';
+            ctx.beginPath();
+            ctx.arc(t.tx, t.ty, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = isSat ? '#047857' : '#4ade80';
+            ctx.beginPath();
+            ctx.arc(t.tx, t.ty, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    });
+
+    const urbanBlocks = [
+        { x: width * 0.32, y: height * 0.05, w: width * 0.16, h: height * 0.32, label: 'CIVIC CENTER & HALL' },
+        { x: width * 0.04, y: height * 0.58, w: width * 0.22, h: height * 0.36, label: 'DOWNTOWN METRO' },
+        { x: width * 0.32, y: height * 0.58, w: width * 0.16, h: height * 0.36, label: 'TECH INCUBATOR' },
+        { x: width * 0.82, y: height * 0.58, w: width * 0.14, h: height * 0.36, label: 'HARBOR TERMINAL' }
+    ];
+
+    urbanBlocks.forEach(b => {
+        ctx.fillStyle = isSat ? '#111c33' : '#ebe8e1';
+        ctx.strokeStyle = isSat ? 'rgba(255, 255, 255, 0.08)' : '#dedad0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(b.x, b.y, b.w, b.h, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = isSat ? 'rgba(255, 255, 255, 0.05)' : '#dfdacf';
+        ctx.fillRect(b.x + 8, b.y + 22, b.w * 0.40, b.h * 0.35);
+        ctx.fillRect(b.x + b.w * 0.54, b.y + 22, b.w * 0.38, b.h * 0.50);
+
+        ctx.fillStyle = isSat ? '#94a3b8' : '#78716c';
+        ctx.font = '700 7.5px Inter, sans-serif';
+        ctx.fillText(b.label, b.x + 8, b.y + 14);
     });
 
     const roads = [
-
-        { x: 0, y: height * 0.44, w: width, h: 26, isHwy: true, name: "METROPOLIS HIGHWAY 101" },
-
-        { x: width * 0.24, y: 0, w: 22, h: height, name: "DOWNTOWN AVE", type: "downtown" },
-
-        { x: width * 0.50, y: 0, w: 22, h: height, name: "SILICON BLVD", type: "downtown" },
-
-        { x: width * 0.76, y: 0, w: 22, h: height, name: "PARKSIDE PKWY", type: "parkway" }
+        { x: 0, y: height * 0.42, w: width, h: 28, isHwy: true, name: 'METROPOLIS EXPRESSWAY 101' },
+        { x: width * 0.28, y: 0, w: 22, h: height, isHwy: false, name: 'DOWNTOWN AVE' },
+        { x: width * 0.50, y: 0, w: 22, h: height, isHwy: false, name: 'SILICON BLVD' },
+        { x: width * 0.78, y: 0, w: 22, h: height, isHwy: false, name: 'PARKSIDE PKWY' }
     ];
 
     roads.forEach(r => {
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(r.x, r.y, r.w, r.h);
+        if (!r.isHwy) {
+            ctx.fillStyle = isSat ? '#334155' : '#cbd5e1';
+            ctx.fillRect(r.x - 1, r.y, r.w + 2, r.h);
 
-        ctx.strokeStyle = r.isHwy ? 'rgba(250, 204, 21, 0.45)' : 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath();
-        if (r.w > r.h) {
-            ctx.moveTo(r.x, r.y + r.h / 2);
-            ctx.lineTo(r.x + r.w, r.y + r.h / 2);
-        } else {
+            ctx.fillStyle = isSat ? '#1e293b' : '#ffffff';
+            ctx.fillRect(r.x, r.y, r.w, r.h);
+
+            ctx.strokeStyle = isSat ? 'rgba(255, 255, 255, 0.25)' : '#e2e8f0';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
             ctx.moveTo(r.x + r.w / 2, r.y);
             ctx.lineTo(r.x + r.w / 2, r.y + r.h);
-        }
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.4)';
-        ctx.font = '7.5px "JetBrains Mono", monospace';
-        if (r.isHwy) {
-            ctx.fillText(r.name, 18, r.y + 16);
+            ctx.stroke();
+            ctx.setLineDash([]);
         }
     });
 
+    const hwy = roads[0];
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.fillStyle = isSat ? '#f59e0b' : '#fb923c';
+    ctx.fillRect(hwy.x, hwy.y - 1.5, hwy.w, hwy.h + 3);
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.fillStyle = isSat ? '#1e293b' : '#fde047';
+    ctx.fillRect(hwy.x, hwy.y, hwy.w, hwy.h);
+
+    ctx.strokeStyle = isSat ? '#facc15' : '#ffffff';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    ctx.moveTo(hwy.x, hwy.y + hwy.h / 2);
+    ctx.lineTo(hwy.x + hwy.w, hwy.y + hwy.h / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#1e3a8a';
+    ctx.beginPath();
+    ctx.roundRect(14, hwy.y + 6, 26, 16, 4);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 8.5px Inter, sans-serif';
+    ctx.fillText('101', 20, hwy.y + 17.5);
+
+    ctx.fillStyle = isSat ? '#f8fafc' : '#78350f';
+    ctx.font = '700 8px Inter, sans-serif';
+    ctx.fillText('METROPOLIS EXPRESSWAY', 46, hwy.y + 17);
+
     let idCounter = 1001;
 
-    const hwyY = height * 0.44;
-    for (let x = 16; x < width - 16; x += 28) {
+    const hwyY = height * 0.42;
+    for (let x = 70; x < width - 16; x += 32) {
         streetLightNodes.push({
             id: idCounter++,
-            x: x,
-            y: hwyY - 4,
-            road: "Highway 101 (North Bound)",
-            typeName: "LED-150W-WHITE",
+            worldX: x,
+            worldY: hwyY - 4,
+            road: 'Highway 101 (North Bound)',
+            typeName: 'AuraSmart-150W',
             wattage: 150,
-            color: '#38bdf8'
+            specs: 'Cisco Smart City • 18,500 lm • 5000K',
+            color: '#0284c7'
         });
         streetLightNodes.push({
             id: idCounter++,
-            x: x + 14,
-            y: hwyY + 30,
-            road: "Highway 101 (South Bound)",
-            typeName: "LED-150W-WHITE",
+            worldX: x + 16,
+            worldY: hwyY + 32,
+            road: 'Highway 101 (South Bound)',
+            typeName: 'AuraSmart-150W',
             wattage: 150,
-            color: '#38bdf8'
+            specs: 'Cisco Smart City • 18,500 lm • 5000K',
+            color: '#0284c7'
         });
     }
 
-    const dtX = width * 0.24;
-    for (let y = 14; y < height - 14; y += 26) {
-        if (Math.abs(y - hwyY) < 30) continue; // skip intersection center
+    const dtX = width * 0.28;
+    for (let y = 14; y < height - 14; y += 28) {
+        if (Math.abs(y - hwyY) < 32) continue;
         streetLightNodes.push({
             id: idCounter++,
-            x: dtX - 4,
-            y: y,
-            road: "Downtown Avenue",
-            typeName: "LED-90W-WARM",
-            wattage: 90,
-            color: '#facc15'
+            worldX: dtX - 4,
+            worldY: y,
+            road: 'Downtown Avenue (West)',
+            typeName: 'SolarPro-100W',
+            wattage: 100,
+            specs: 'Siemens Smart Infra • 12,000 lm • 4000K',
+            color: '#f59e0b'
         });
         streetLightNodes.push({
             id: idCounter++,
-            x: dtX + 26,
-            y: y,
-            road: "Downtown Avenue",
-            typeName: "LED-90W-WARM",
-            wattage: 90,
-            color: '#facc15'
+            worldX: dtX + 26,
+            worldY: y,
+            road: 'Downtown Avenue (East)',
+            typeName: 'SolarPro-100W',
+            wattage: 100,
+            specs: 'Siemens Smart Infra • 12,000 lm • 4000K',
+            color: '#f59e0b'
         });
     }
 
     const silX = width * 0.50;
-    for (let y = 14; y < height - 14; y += 26) {
-        if (Math.abs(y - hwyY) < 30) continue;
+    for (let y = 14; y < height - 14; y += 28) {
+        if (Math.abs(y - hwyY) < 32) continue;
         streetLightNodes.push({
             id: idCounter++,
-            x: silX - 4,
-            y: y,
-            road: "Silicon Boulevard",
-            typeName: "LED-90W-WARM",
-            wattage: 90,
-            color: '#facc15'
+            worldX: silX - 4,
+            worldY: y,
+            road: 'Silicon Boulevard (West)',
+            typeName: 'SolarPro-100W',
+            wattage: 100,
+            specs: 'Siemens Smart Infra • 12,000 lm • 4000K',
+            color: '#f59e0b'
         });
         streetLightNodes.push({
             id: idCounter++,
-            x: silX + 26,
-            y: y,
-            road: "Silicon Boulevard",
-            typeName: "LED-90W-WARM",
-            wattage: 90,
-            color: '#facc15'
+            worldX: silX + 26,
+            worldY: y,
+            road: 'Silicon Boulevard (East)',
+            typeName: 'SolarPro-100W',
+            wattage: 100,
+            specs: 'Siemens Smart Infra • 12,000 lm • 4000K',
+            color: '#f59e0b'
         });
     }
 
-    const parkX = width * 0.76;
-    for (let y = 14; y < height - 14; y += 28) {
-        if (Math.abs(y - hwyY) < 30) continue;
+    const parkX = width * 0.78;
+    for (let y = 14; y < height - 14; y += 30) {
+        if (Math.abs(y - hwyY) < 32) continue;
         streetLightNodes.push({
             id: idCounter++,
-            x: parkX - 4,
-            y: y,
-            road: "Parkside Parkway",
-            typeName: "SOLAR-60W-ECO",
+            worldX: parkX - 4,
+            worldY: y,
+            road: 'Parkside Parkway (West)',
+            typeName: 'LumaEco-60W',
             wattage: 60,
-            color: '#84cc16'
+            specs: 'Philips Lumec • 7,200 lm • 3000K',
+            color: '#65a30d'
         });
         streetLightNodes.push({
             id: idCounter++,
-            x: parkX + 26,
-            y: y,
-            road: "Parkside Parkway",
-            typeName: "SOLAR-60W-ECO",
+            worldX: parkX + 26,
+            worldY: y,
+            road: 'Parkside Parkway (East)',
+            typeName: 'LumaEco-60W',
             wattage: 60,
-            color: '#84cc16'
+            specs: 'Philips Lumec • 7,200 lm • 3000K',
+            color: '#65a30d'
         });
     }
 
     streetLightNodes.forEach(node => {
         if (lightsOn) {
+            const glowRadius = isSat ? 16 : 14;
+            const grad = ctx.createRadialGradient(node.worldX, node.worldY, 1, node.worldX, node.worldY, glowRadius);
+            grad.addColorStop(0, node.color);
+            grad.addColorStop(0.35, isSat ? 'rgba(255,255,255,0.7)' : 'rgba(254, 240, 138, 0.6)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = node.color;
-            ctx.fillStyle = node.color;
+            ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.arc(node.x, node.y, 3.2, 0, Math.PI * 2);
+            ctx.arc(node.worldX, node.worldY, glowRadius, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(node.x, node.y, 1.2, 0, Math.PI * 2);
+            ctx.arc(node.worldX, node.worldY, 2.4, 0, Math.PI * 2);
             ctx.fill();
-        } else {
 
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#475569';
+            ctx.strokeStyle = node.color;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        } else {
+            ctx.fillStyle = isSat ? '#475569' : '#64748b';
             ctx.beginPath();
-            ctx.arc(node.x, node.y, 2.5, 0, Math.PI * 2);
+            ctx.arc(node.worldX, node.worldY, 2.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = isSat ? '#1e293b' : '#334155';
+            ctx.beginPath();
+            ctx.arc(node.worldX, node.worldY, 1.2, 0, Math.PI * 2);
             ctx.fill();
         }
     });
 
-    ctx.shadowBlur = 0;
+    ctx.restore();
 }
+
 
 function initPartEInterpreter() {
     const preset = document.getElementById('dslRulePreset');
