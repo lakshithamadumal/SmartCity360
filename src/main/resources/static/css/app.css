@@ -142,6 +142,7 @@ body {
   cursor: pointer;
   position: relative;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .nav-item:hover {
