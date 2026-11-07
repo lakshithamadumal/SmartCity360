@@ -12,26 +12,82 @@ function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const stagePanels = document.querySelectorAll('.stage-tab-content, .stage-panel');
 
+    const stageToRoute = {
+        'stage-overview': 'dashboard',
+        'stage-decorator': 'energy-security',
+        'stage-composite': 'smart-zones',
+        'stage-chain': 'complaints',
+        'stage-flyweight': 'streetlights',
+        'stage-interpreter': 'policy-rules'
+    };
+
+    const routeToStage = {
+        'dashboard': 'stage-overview',
+        'overview': 'stage-overview',
+        'energy-security': 'stage-decorator',
+        'decorator': 'stage-decorator',
+        'smart-zones': 'stage-composite',
+        'composite': 'stage-composite',
+        'complaints': 'stage-chain',
+        'chain': 'stage-chain',
+        'streetlights': 'stage-flyweight',
+        'flyweight': 'stage-flyweight',
+        'policy-rules': 'stage-interpreter',
+        'interpreter': 'stage-interpreter'
+    };
+
+    function activateStage(stageId, updateUrl = true) {
+        if (!stageId) return;
+
+        navItems.forEach(n => {
+            if (n.getAttribute('data-stage') === stageId) {
+                n.classList.add('active');
+            } else {
+                n.classList.remove('active');
+            }
+        });
+
+        stagePanels.forEach(p => {
+            if (p.id === stageId) {
+                p.classList.add('active');
+            } else {
+                p.classList.remove('active');
+            }
+        });
+
+        if (updateUrl) {
+            const route = stageToRoute[stageId] || 'dashboard';
+            if (window.location.hash !== '#' + route) {
+                history.pushState(null, '', '#' + route);
+            }
+        }
+
+        if (stageId === 'stage-flyweight') {
+            setTimeout(renderFlyweightCanvas, 60);
+        }
+    }
+
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             const targetStageId = item.getAttribute('data-stage');
             if (!targetStageId) return;
             e.preventDefault();
-
-            navItems.forEach(n => n.classList.remove('active'));
-            stagePanels.forEach(p => p.classList.remove('active'));
-
-            item.classList.add('active');
-            const targetPanel = document.getElementById(targetStageId);
-            if (targetPanel) {
-                targetPanel.classList.add('active');
-            }
-
-            if (targetStageId === 'stage-flyweight') {
-                renderFlyweightCanvas();
-            }
+            activateStage(targetStageId, true);
         });
     });
+
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash.replace('#', '').toLowerCase().trim();
+        const targetStage = routeToStage[hash] || 'stage-overview';
+        activateStage(targetStage, false);
+    });
+
+    const initialHash = window.location.hash.replace('#', '').toLowerCase().trim();
+    if (initialHash && routeToStage[initialHash]) {
+        activateStage(routeToStage[initialHash], false);
+    } else {
+        activateStage('stage-overview', true);
+    }
 }
 
 function initPartADecorator() {
