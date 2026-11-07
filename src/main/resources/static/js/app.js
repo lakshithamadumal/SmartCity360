@@ -181,8 +181,8 @@ function initPartADecorator() {
             .then(res => res.json())
             .then(data => {
                 const rawPreview = document.getElementById('rawStreamPreview');
-                const secPreview = document.getElementById('securedStreamPreview');
-                const layerCountBadge = document.getElementById('decoratorLayersCount');
+                const secPreview = document.getElementById('securedPayloadPreview');
+                const layerCountBadge = document.getElementById('appliedLayersCount');
 
                 if (rawPreview) rawPreview.textContent = data.rawPayload || JSON.stringify(rawData, null, 2);
                 if (secPreview) secPreview.textContent = "// Pipeline: " + data.pipeline + "\n\n" + data.securedPayload;
@@ -222,8 +222,8 @@ function generateTransformedStream() {
 
     const rawString = JSON.stringify(rawPayload, null, 2);
     const rawPreview = document.getElementById('rawStreamPreview');
-    const secPreview = document.getElementById('securedStreamPreview');
-    const layerCountBadge = document.getElementById('decoratorLayersCount');
+    const secPreview = document.getElementById('securedPayloadPreview');
+    const layerCountBadge = document.getElementById('appliedLayersCount');
 
     if (rawPreview) rawPreview.textContent = rawString;
 
@@ -260,9 +260,9 @@ let selectedZoneNode = null;
 let currentZoneTreeData = null;
 
 function initPartBComposite() {
-    const btnShutdown = document.getElementById('btnPowerShutdown');
-    const btnRestore = document.getElementById('btnPowerRestore');
-    const btnUsage = document.getElementById('btnReportUsage');
+    const btnShutdown = document.getElementById('btnZoneShutdown');
+    const btnRestore = document.getElementById('btnZoneRestore');
+    const btnUsage = document.getElementById('btnZoneReport');
 
     function loadBackendZoneTree() {
         fetch('/api/zones/tree')
@@ -332,7 +332,7 @@ function updateSelectedNodeReference(root, targetId) {
 }
 
 function renderZoneTreeFromData(rootNode) {
-    const container = document.getElementById('zoneTreeHierarchy');
+    const container = document.getElementById('zoneTreeContainer');
     if (!container || !rootNode) return;
     container.innerHTML = '';
 
@@ -1281,34 +1281,78 @@ function escapeHtml(str) {
 }
 
 function initChartInteractivity() {
-    const chartPolyline = document.getElementById('energyTrendLine');
-    const chartPoints = document.querySelectorAll('.chart-data-point');
-    const chartTooltip = document.getElementById('chartHoverTooltip');
-    const tipValue = document.getElementById('chartTipValue');
-    const tipDay = document.getElementById('chartTipDay');
+    const container = document.getElementById('energyChartContainer');
+    const tooltip = document.getElementById('chartTooltip');
+    const arrow = document.getElementById('tooltipArrow');
+    if (!container || !tooltip) return;
 
-    if (!chartPoints.length || !chartTooltip) return;
+    const columns = container.querySelectorAll('.bar-day-column');
+    const dateEl = document.getElementById('tooltipDate');
+    const resEl = document.getElementById('tooltipResidential');
+    const commEl = document.getElementById('tooltipCommercial');
+    const indEl = document.getElementById('tooltipIndustrial');
+    const indRow = document.getElementById('tooltipIndustrialRow');
+    const totalEl = document.getElementById('tooltipTotal');
 
-    chartPoints.forEach(pt => {
-        pt.addEventListener('mouseenter', (e) => {
-            const val = pt.getAttribute('data-value') || '12,450';
-            const day = pt.getAttribute('data-day') || 'Today';
+    function updateTooltip(col) {
+        if (!col) return;
+        const colRect = col.getBoundingClientRect();
+        const contRect = container.getBoundingClientRect();
 
-            if (tipValue) tipValue.textContent = `${val} kWh`;
-            if (tipDay) tipDay.textContent = day;
+        const colCenter = (colRect.left - contRect.left) + (colRect.width / 2);
 
-            const cx = parseFloat(pt.getAttribute('cx') || 0);
-            const cy = parseFloat(pt.getAttribute('cy') || 0);
+        const tipWidth = tooltip.offsetWidth || 185;
+        const halfWidth = tipWidth / 2;
+        const contWidth = contRect.width;
 
-            chartTooltip.style.display = 'block';
-            chartTooltip.style.left = `${(cx / 560) * 100}%`;
-            chartTooltip.style.top = `${cy - 12}px`;
+        const minLeft = halfWidth + 12;
+        const maxLeft = contWidth - halfWidth - 12;
+        const clampedLeft = Math.max(minLeft, Math.min(maxLeft, colCenter));
+
+        tooltip.style.left = `${clampedLeft}px`;
+
+        if (arrow) {
+            const arrowOffset = colCenter - clampedLeft;
+            arrow.style.left = `calc(50% + ${arrowOffset}px)`;
+        }
+
+        if (dateEl) dateEl.textContent = col.getAttribute('data-date') || '';
+        if (resEl) resEl.textContent = col.getAttribute('data-res') || '0 kWh';
+        if (commEl) commEl.textContent = col.getAttribute('data-comm') || '0 kWh';
+
+        const indVal = col.getAttribute('data-ind');
+        if (indRow && indEl) {
+            if (indVal && indVal !== '0 kWh') {
+                indRow.style.display = 'flex';
+                indEl.textContent = indVal;
+            } else {
+                indRow.style.display = 'none';
+            }
+        }
+
+        if (totalEl) totalEl.textContent = col.getAttribute('data-total') || '';
+        tooltip.style.opacity = '1';
+
+        columns.forEach(c => {
+            c.classList.remove('active');
+            const track = c.querySelector('.bar-track');
+            if (track) track.classList.remove('active-day');
         });
 
-        pt.addEventListener('mouseleave', () => {
-            chartTooltip.style.display = 'none';
-        });
+        col.classList.add('active');
+        const activeTrack = col.querySelector('.bar-track');
+        if (activeTrack) activeTrack.classList.add('active-day');
+    }
+
+    columns.forEach(col => {
+        col.addEventListener('mouseenter', () => updateTooltip(col));
+        col.addEventListener('click', () => updateTooltip(col));
     });
+
+    const defaultCol = container.querySelector('.bar-day-column[data-day="Wed"]') || columns[3];
+    if (defaultCol) {
+        setTimeout(() => updateTooltip(defaultCol), 150);
+    }
 }
 
 
