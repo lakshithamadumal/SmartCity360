@@ -104,7 +104,7 @@
                 <i class="fas fa-route"></i>
               </div>
             </div>
-            <div class="big-stat-number" style="font-size: 26px; margin: 8px 0 4px;">19 Open Tickets</div>
+            <div class="big-stat-number" id="dashTicketCount" style="font-size: 26px; margin: 8px 0 4px;">0 Dispatched Tickets</div>
             <div style="font-size: 12px; color: var(--text-muted);">Local Staff, Supervisors, City Manager</div>
             <div style="font-size: 11px; color: var(--accent-orange); font-weight: 600; margin-top: 6px;">
               <i class="fas fa-clock"></i> Automated Escalation
@@ -118,8 +118,8 @@
                 <i class="fas fa-lightbulb"></i>
               </div>
             </div>
-            <div class="big-stat-number" style="font-size: 26px; margin: 8px 0 4px;">50,000 Nodes</div>
-            <div style="font-size: 12px; color: var(--text-muted);">RAM Footprint: 2.1 MB</div>
+            <div class="big-stat-number" id="dashFleetCount" style="font-size: 26px; margin: 8px 0 4px;">50,000 Nodes</div>
+            <div id="dashFleetRam" style="font-size: 12px; color: var(--text-muted);">RAM Footprint: 1.8 MB (95.9% Saved)</div>
             <div style="font-size: 11px; color: var(--accent-lime); font-weight: 600; margin-top: 6px;">
               <i class="fas fa-microchip"></i> High-Efficiency Pooled
             </div>
@@ -305,52 +305,52 @@
               </div>
             </div>
 
-            <div class="history-list-wrap">
+            <div class="history-list-wrap" id="dashActivityFeed">
               <div class="history-item-row">
                 <div class="history-item-left">
                   <div class="history-icon-square" style="background: #ecfccb; color: #4d7c0f;">
-                    <i class="fas fa-shield"></i>
+                    <i class="fas fa-server"></i>
                   </div>
                   <div class="history-item-texts">
-                    <div class="history-title">Meter Stream #9042</div>
-                    <div class="history-date">Secured with AES-256 + HMAC + GZip</div>
+                    <div class="history-title">Pure Java GoF Subsystems Initialized</div>
+                    <div class="history-date">Spring Boot REST Controllers active on port 8080</div>
                   </div>
                 </div>
                 <div class="history-item-right">
                   <span class="history-amount">Active</span>
-                  <span class="history-status-badge completed">Secured</span>
-                </div>
-              </div>
-
-              <div class="history-item-row">
-                <div class="history-item-left">
-                  <div class="history-icon-square" style="background: #fee2e2; color: #b91c1c;">
-                    <i class="fas fa-power-off"></i>
-                  </div>
-                  <div class="history-item-texts">
-                    <div class="history-title">Downtown Zone Shutdown</div>
-                    <div class="history-date">Uniform power cut command executed</div>
-                  </div>
-                </div>
-                <div class="history-item-right">
-                  <span class="history-amount" style="color: var(--accent-crimson);">Power Cut</span>
-                  <span class="history-status-badge declined">Sub-grid</span>
+                  <span class="history-status-badge completed">Ready</span>
                 </div>
               </div>
 
               <div class="history-item-row">
                 <div class="history-item-left">
                   <div class="history-icon-square" style="background: #e0f2fe; color: #0284c7;">
-                    <i class="fas fa-lightbulb"></i>
+                    <i class="fas fa-microchip"></i>
                   </div>
                   <div class="history-item-texts">
-                    <div class="history-title">Streetlights Fleet Pooled</div>
-                    <div class="history-date">50,000 lights allocated in memory</div>
+                    <div class="history-title">Flyweight Factory Cache Mounted</div>
+                    <div class="history-date">3 Shared Intrinsic Types cached in ConcurrentHashMap</div>
                   </div>
                 </div>
                 <div class="history-item-right">
-                  <span class="history-amount">2.1 MB</span>
-                  <span class="history-status-badge completed">95.6% Saved</span>
+                  <span class="history-amount">95.9% Saved</span>
+                  <span class="history-status-badge completed">Cached</span>
+                </div>
+              </div>
+
+              <div class="history-item-row">
+                <div class="history-item-left">
+                  <div class="history-icon-square" style="background: #fef9c3; color: #a16207;">
+                    <i class="fas fa-sitemap"></i>
+                  </div>
+                  <div class="history-item-texts">
+                    <div class="history-title">Composite Grid Tree Mounted</div>
+                    <div class="history-date">4 Hierarchy Levels (City ➔ District ➔ Street ➔ Building)</div>
+                  </div>
+                </div>
+                <div class="history-item-right">
+                  <span class="history-amount">4 Levels</span>
+                  <span class="history-status-badge completed">Mounted</span>
                 </div>
               </div>
 
@@ -360,51 +360,16 @@
                     <i class="fas fa-route"></i>
                   </div>
                   <div class="history-item-texts">
-                    <div class="history-title">Water Main Burst #8911</div>
-                    <div class="history-date">Level 4 Severity escalated to Supervisor</div>
+                    <div class="history-title">Chain of Responsibility Ready</div>
+                    <div class="history-date">Local Staff ➔ Field Supervisor ➔ City Manager linked</div>
                   </div>
                 </div>
                 <div class="history-item-right">
-                  <span class="history-amount">Tier 2</span>
-                  <span class="history-status-badge pending">Dispatched</span>
-                </div>
-              </div>
-
-              <div class="history-item-row">
-                <div class="history-item-left">
-                  <div class="history-icon-square" style="background: #f3e8ff; color: #7e22ce;">
-                    <i class="fas fa-scale-balanced"></i>
-                  </div>
-                  <div class="history-item-texts">
-                    <div class="history-title">Noise Limit Violation (74 dB)</div>
-                    <div class="history-date">Residential zone rule evaluated</div>
-                  </div>
-                </div>
-                <div class="history-item-right">
-                  <span class="history-amount" style="color: var(--accent-crimson);">Violation</span>
-                  <span class="history-status-badge declined">Fined</span>
-                </div>
-              </div>
-
-              <div class="history-item-row">
-                <div class="history-item-left">
-                  <div class="history-icon-square" style="background: #e0e7ff; color: #4338ca;">
-                    <i class="fas fa-network-wired"></i>
-                  </div>
-                  <div class="history-item-texts">
-                    <div class="history-title">Substation Alpha Telemetry</div>
-                    <div class="history-date">Automated meter telemetry verified</div>
-                  </div>
-                </div>
-                <div class="history-item-right">
-                  <span class="history-amount">1,420 pkts</span>
-                  <span class="history-status-badge completed">Verified</span>
+                  <span class="history-amount">3 Tiers</span>
+                  <span class="history-status-badge completed">Linked</span>
                 </div>
               </div>
             </div>
-          </div>
-
-        </div>
 
         </div>
       </section>

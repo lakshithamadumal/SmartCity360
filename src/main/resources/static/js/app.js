@@ -189,6 +189,7 @@ function initPartADecorator() {
                 if (layerCountBadge) layerCountBadge.textContent = `${data.activeLayers} Layer(s)`;
 
                 showNotification('Stream Secured via Pure Java GoF Decorator Pipeline!', 'success');
+                recordDashboardActivity('Stream Telemetry #' + meterId, 'Secured via ' + (data.activeLayers || 1) + ' Decorator Layers', 'Active', 'Secured', 'completed', 'fas fa-shield-halved', '#ecfccb', '#4d7c0f');
             })
             .catch(() => {
                 updateLayers();
@@ -296,6 +297,7 @@ function initPartBComposite() {
                 renderZoneTreeFromData(currentZoneTreeData);
             }
             showNotification(`Composite Command ${cmd} Executed on ${selectedZoneNode.name}!`, 'success');
+            recordDashboardActivity(selectedZoneNode.name + ' Command', 'Executed ' + cmd + ' across hierarchy', cmd === 'SHUTDOWN' ? 'Power Cut' : 'Restored', cmd === 'SHUTDOWN' ? 'Sub-grid' : 'Active', cmd === 'SHUTDOWN' ? 'declined' : 'completed', 'fas fa-power-off', '#fee2e2', '#b91c1c');
         })
         .catch(() => {
             if (cmd === 'SHUTDOWN') recursivePowerCommand(selectedZoneNode, false);
@@ -495,6 +497,8 @@ function initPartCChain() {
                 const tbody = document.getElementById('complaintHistoryTableBody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
+                const dashTicket = document.getElementById('dashTicketCount');
+                if (dashTicket) dashTicket.textContent = (list ? list.length : 0) + ' Dispatched Tickets';
                 if (list && list.length > 0) {
                     list.forEach(c => addComplaintHistoryRow(c.ticketId, c.citizenName, c.category, c.severity, c.handledBy, c.resolved ? 'RESOLVED' : 'PENDING'));
                 } else {
@@ -545,6 +549,12 @@ function initPartCChain() {
 
                 addComplaintHistoryRow(data.ticketId, data.citizenName, data.category, data.severity, data.handledBy, data.resolved ? 'RESOLVED' : 'PENDING');
                 showNotification(`Ticket ${data.ticketId} escalated & resolved by ${data.handledBy}!`, 'success');
+                const dashTicket = document.getElementById('dashTicketCount');
+                if (dashTicket) {
+                    const cur = parseInt(dashTicket.textContent, 10) || 0;
+                    dashTicket.textContent = (cur + 1) + ' Dispatched Tickets';
+                }
+                recordDashboardActivity('Ticket #' + data.ticketId, 'Escalated to ' + data.handledBy, 'Tier ' + data.severity, 'Resolved', 'completed', 'fas fa-route', '#ffedd5', '#c2410c');
             })
             .catch(() => {
                 const emptyRow = document.getElementById('emptyComplaintRow');
@@ -686,6 +696,9 @@ function initPartDFlyweight() {
 
                     renderFlyweightCanvas();
                     showNotification(`Allocated ${data.fleetCount.toLocaleString()} nodes using ${data.sharedFlyweightTypesCount} shared Flyweights (${data.memoryReductionPercentage}% RAM saved)!`, 'success');
+                    const dRam = document.getElementById('dashFleetRam');
+                    if (dRam) dRam.textContent = 'RAM Footprint: ' + data.flyweightHeapMB + ' MB (' + data.memoryReductionPercentage + '% Saved)';
+                    recordDashboardActivity('Flyweight Allocation', data.fleetCount.toLocaleString() + ' nodes pooled via ' + data.sharedFlyweightTypesCount + ' shared types', data.flyweightHeapMB + ' MB', '95.9% Saved', 'completed', 'fas fa-microchip', '#e0f2fe', '#0284c7');
                 })
                 .catch(() => {
                     updateMemoryCalc();
@@ -716,6 +729,7 @@ function initPartDFlyweight() {
 
             renderFlyweightCanvas();
             showNotification(`Toggled extrinsic state: Lights turned ${lightsOn ? 'ON' : 'OFF'} across fleet!`, 'info');
+            recordDashboardActivity('Streetlights Fleet Toggle', lightsOn ? '50,000 lights powered ON' : '50,000 lights switched to standby', lightsOn ? '100% Lumens' : 'Standby', lightsOn ? 'Active' : 'Standby', lightsOn ? 'completed' : 'declined', 'fas fa-lightbulb', '#e0f2fe', '#0284c7');
         });
     }
 
@@ -1219,6 +1233,7 @@ function initPartEInterpreter() {
                 }
 
                 showNotification(`DSL Rule Parsed & Evaluated via Java Interpreter Pattern: ${data.status}!`, data.compliant ? 'success' : 'danger');
+                recordDashboardActivity('Policy Rule Evaluation', data.compliant ? 'Rule PASSED compliance check' : 'VIOLATION: threshold exceeded', data.compliant ? 'PASS' : 'Violation', data.compliant ? 'Compliant' : 'Fined', data.compliant ? 'completed' : 'declined', 'fas fa-scale-balanced', '#f3e8ff', '#7e22ce');
             })
             .catch(() => {
                 const isViolation = (zone === 'RESIDENTIAL' && noise > 65);
@@ -1294,6 +1309,33 @@ function initChartInteractivity() {
             chartTooltip.style.display = 'none';
         });
     });
+}
+
+
+function recordDashboardActivity(title, desc, amount, badgeText, badgeClass, iconClass, iconBg, iconColor) {
+    const feed = document.getElementById('dashActivityFeed');
+    if (!feed) return;
+    const row = document.createElement('div');
+    row.className = 'history-item-row';
+    row.innerHTML = `
+        <div class="history-item-left">
+            <div class="history-icon-square" style="background: ${iconBg}; color: ${iconColor};">
+                <i class="${iconClass}"></i>
+            </div>
+            <div class="history-item-texts">
+                <div class="history-title">${escapeHtml(title)}</div>
+                <div class="history-date">${escapeHtml(desc)}</div>
+            </div>
+        </div>
+        <div class="history-item-right">
+            <span class="history-amount">${escapeHtml(amount)}</span>
+            <span class="history-status-badge ${badgeClass}">${escapeHtml(badgeText)}</span>
+        </div>
+    `;
+    feed.prepend(row);
+    if (feed.children.length > 8) {
+        feed.lastElementChild.remove();
+    }
 }
 
 function showNotification(msg, type = 'info') {
